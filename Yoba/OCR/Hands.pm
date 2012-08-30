@@ -7,7 +7,7 @@ use Carp;
 
 use base "Exporter"; our @EXPORT = qw/get_ocr/;
 
-# use Gtk2 -init;
+use Gtk2 -init;
 
 use Yoba;
 

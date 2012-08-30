@@ -1,4 +1,4 @@
-package Piston::Engines::Kusaba;
+package Piston::Engines::Nullchan;
 
 use 5.10.1;
 use strict;

@@ -167,7 +167,7 @@ sub yobatext {
    $text =~ s/([\.\!\?])\s([$a])/$1 \u$2/g;
    $text =~ s/^\s+([$a])/\u$1/;
    $text =~ s/([\.\!\?])?\s+$/$1 || '.'/e;
-   encode("utf-8", $text);
+   return encode("utf-8", $text);
 }
 
 # -> string

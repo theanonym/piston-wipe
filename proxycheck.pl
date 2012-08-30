@@ -31,7 +31,6 @@ GetOptions($opt,
    "url=s", "threads=s",
    "time=s", "attempts=s",
    "skip=s", "wait=s",
-   "nullchan",
    "help" => sub { print_help(); exit }
 );
 
