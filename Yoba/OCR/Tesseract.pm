@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use Carp;
 
-use base "Exporter"; our @EXPORT = qw/get_ocr/;
+use base "Exporter";
+our @EXPORT = qw/get_ocr/;
 
 use Yoba;
 use Yoba::Tesseract;
@@ -14,7 +15,7 @@ use Yoba::Tesseract;
 # <- string
 sub get_ocr($;@) {
    my($file, @args) = @_;
-   @args = ("eng", "english") unless @args;
+   @args = ("eng", "eng_all") unless @args;
    my $text = tesseract($file, $args[0], $args[1]);
    # $text =~ s/[^a-z]//i;
    # $text =~ s/\s+|\s+//g;

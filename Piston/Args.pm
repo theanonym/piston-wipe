@@ -127,7 +127,6 @@ if(defined $opt->{board}) {
 if(@{ $opt->{threads} }) {
    array_unique($opt->{threads});
    $Piston::config->{threads} = $opt->{threads};
-   say for @{ $Piston::config->{threads} };
 }
 
 # --youtube

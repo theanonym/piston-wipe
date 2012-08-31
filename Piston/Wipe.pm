@@ -86,7 +86,7 @@ sub after_captcha() {
          my($fmt) = $self->{captcha_response}->{_headers}->{"content-type"} =~ /image\/(.*)/;
          my $fname = catfile($Piston::config->{tmpdir}, substr(rand, -10) . ".$fmt");
          write_file($fname, { binmode => ":raw" }, $self->{captcha_response}->{_content});
-         Carp::carp "С капчей что-то не так" unless -s $fname;
+         Carp::carp "С капчей что-то не так" unless -f $fname;
          $self->{captcha}->{file} = $fname;
       } when([2, 3]) {
          $self->log(4, "КАПЧА", $error);

@@ -7,7 +7,7 @@ use Carp;
 
 use File::Slurp qw/read_file write_file/;
 use File::Path qw/rmtree mkpath/;
-use File::Spec::Functions qw/catfile catdir/;
+use File::Spec::Functions qw/tmpdir catfile catdir/;
 
 use Term::ANSIColor qw/color colored/;
 
@@ -28,11 +28,7 @@ our $chans;
 BEGIN {
    our $VERSION = "2.6.3";
    our $opt;
-}
 
-use Yoba;
-
-BEGIN {
    require "config.pl";
    require "chans.pl";
 
@@ -44,14 +40,13 @@ BEGIN {
 
    $config->{thischan} = $chans->{$config->{chan}};
 
-   $config->{tmp} = catfile(Yoba::tmpdir(), "piston_wipe");
+   $config->{tmp} = catfile(tmpdir(), "piston_wipe");
    $config->{tmpdir} = catfile($config->{tmp}, $config->{chan});
    mkpath($config->{tmpdir});
 
    $config->{wait} = $config->{thischan}->{
       $config->{threads}->[0] ? "posts_delay" : "threads_delay"
    } || 1;
-
 }
 
 
@@ -111,7 +106,7 @@ sub run {
    $p->start_all;
 
    while(1) {
-      Piston::sleep_this_thread(2); # Изменил с 2 на 5
+      Piston::sleep_this_thread(2);
       Piston::Extensions::main() if $Piston::config->{enable_extensions};
       #----------------------------------------
    }
@@ -145,18 +140,8 @@ sub wipe_func_1($) {
             $errors{$proxy} = -1;
             $wipe->run_ocr("");
             $wipe->log(3, "КАПЧА", "Капча не введена!") unless $wipe->{captcha}->is_entered;
-         } elsif($wipe->{captcha}->is_entered) { #TODO ...
-            say "is entered";
          } else {
             $errors{$proxy}++ if $errors{$proxy} != -1;
-            if($wipe->{captcha_response}->{_rc} && $wipe->{captcha_response}->{_rc} == 200) {
-               # $wipe->log(3, "КАПЧА","Нет капчи");
-               # say $wipe->{captcha_response}->headers_as_string;
-            }
-         }
-
-         if($wipe->{captcha_status} && $wipe->{captcha_status} == 1 && !$wipe->{captcha}->has_file) {
-            $wipe->log(3, "КАПЧА", "Нет капчи!");
          }
       }
       #----------------------------------------
