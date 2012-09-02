@@ -86,16 +86,20 @@ sub handle_captcha_response($) {
    my $response = $wipe->{captcha_response};
    my($error, $code);
    #----------------------------------------
+   my $fmt = $Piston::config->{thischan}->{captcha};
    if(exists $response->{_headers}->{"content-type"}
-      && $response->{_headers}->{"content-type"} =~ /image\/$Piston::config->{thischan}->{captcha}/) {
+      && $response->{_headers}->{"content-type"} =~ /image\/$fmt/) {
       write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
       return(1, "");
    } else {
       ($error, $code) = ($response->status_line, 2);
    }
    #----------------------------------------
-   if($response->{_rc} == 403) {
-      $code = 5;
+   if($response->{_rc} ~~ [400, 403] ||
+      ($response->{_rc} == 200 &&
+         (!exists $response->{_headers}->{"content-type"} ||
+         $response->{_headers}->{"content-type"} !~ /image\/$fmt/))) {
+      $code = 3;
       write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
    #----------------------------------------
@@ -107,7 +111,8 @@ my $errors = {
    b => qr/(
       Неправильно\ введена\ капча|Этот\ файл\ уже\ загружен|
       тобы\ ответить,\ загрузите\ изображение|Flood\ detected|
-      File\ transfer\ failure|BuildThread|Неправильный\ ID\ треда
+      File\ transfer\ failure|BuildThread|Неправильный\ ID\ треда|
+      possible\ proxy
    )/xo,
 };
 

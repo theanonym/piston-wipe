@@ -32,7 +32,6 @@ sub extension {
    my $args = {@_};
    return if($args->{if} && !$args->{if}->());
    for my $point (@points) {
-      Carp::croak "Неверное расположение расширения" unless $point ~~ @points;
       Carp::croak "Неверный приоритет" if($args->{prio} && not $args->{prio} ~~ [0 .. 10]);
       next unless defined $args->{$point};
       my $ext = {
