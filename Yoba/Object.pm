@@ -18,7 +18,6 @@ sub import {
 
 sub _constructor {
    my $package = shift;
-   Carp::croak if defined *{ $package . "::BUILD" }; #TODO Заглушка
    my $self = bless {@_}, $package;
    if(defined *{ $package . "::CONSTRUCT" }) {
       $self->CONSTRUCT;

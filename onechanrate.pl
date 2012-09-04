@@ -60,9 +60,7 @@ HLP
 
 Carp::croak("Файл с проски не указан или не существует") unless -f $opt->{proxylist};
 
-$opt->{cookie_tmpdir} = $opt->{tmpdir} . "/" . "cookies";
 mkpath($opt->{tmpdir});
-mkpath($opt->{cookie_tmpdir});
 
 my $lwp = new Yoba::LWP;
 $lwp->agent("Opera/9.80 (X11; Linux i686; U; en) Presto/2.10.289 Version/12.00");
