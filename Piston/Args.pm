@@ -151,8 +151,8 @@ if(my @arg = @{ $opt->{images} }) {
    mkpath($folder);
    my $w = new Yoba::Coro::Watcher;
    my $p = new Yoba::Coro::Pool(
-      limit => 200,
-      timelimit => 30,
+      limit => 10,
+      timelimit => 60,
       params => \@urls,
       function   => sub {
          my($url) = @_;
