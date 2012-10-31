@@ -31,10 +31,11 @@ extension(
 
 sub check_catalog {
    my %catalog;
-   eval {
+   try {
       %catalog = parse_threads_table(get_catalog_page($Piston::config->{board}));
+   } catch {
+      warn;
    };
-   warn $@ if $@;
    $Piston::shared->{catalog} = \%catalog;
 }
 

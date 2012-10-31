@@ -57,9 +57,21 @@ sub CONSTRUCT {
 sub before_captcha() {
    my $self = shift;
    #----------------------------------------
+   if($Piston::config->{thischan}->{recaptcha}) {
+      my $req = Piston::Engines::key_request($self);
+      my $res = $self->{lwp}->request($req);
+      if($res->content =~ /challenge : '(.*?)'/) {
+         $self->{recaptcha_key} = $1;
+         $self->log(0, "КАПЧА", "Получен ключ рекапчи");
+      } else {
+         $self->log(0, "КАПЧА", "Не удалось получить ключ рекапчи");
+      }
+   }
+   #----------------------------------------
    unless($Piston::config->{pregen}) {
       $self->{captcha_request} = Piston::Engines::captcha_request($self);
    }
+   #----------------------------------------
    Piston::Extensions::before_captcha_request($self) if $Piston::config->{enable_extensions};
    #----------------------------------------
    return;
@@ -69,6 +81,7 @@ sub get_captcha() {
    my $self = shift;
    #----------------------------------------
    # $self->log(1, "КАПЧА", "Запрос капчи");
+   #TODO if $self->{captcha_request}
    $self->{captcha_response} = $self->{lwp}->request($self->{captcha_request});
    #----------------------------------------
    return;

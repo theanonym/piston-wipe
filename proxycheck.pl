@@ -20,7 +20,7 @@ my $opt = {
    infile  => undef,
    outfile => undef,
 
-   url      => "http://0chan.ru/vg",
+   url      => "http://0chan.hk/vg",
    threads  => 500,
    time     => 20,
    attempts => 1,
@@ -52,7 +52,7 @@ Yoba proxy checker
    --at(tempts) | Попыток проверить прокси ($opt->{attempts} по умолчанию)
 
 Примеры:
-   --url http://0chan.ru/vg/  -i all_proxy.txt  -o proxylist.txt
+   --url http://0chan.hk/vg/  -i all_proxy.txt  -o proxylist.txt
 HLP
 }
 

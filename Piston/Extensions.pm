@@ -58,8 +58,11 @@ for my $pos (@points) {
       return unless $shared->{$pos};
       my(@args) = @_;
       for my $ext (sort { $a->{prio} < $b->{prio} } @{ $shared->{$pos} }) {
-         eval { $ext->{code}->(@args) };
-         print colored("Расширение '$ext->{name}': $@", "red") if $@;
+         try {
+            $ext->{code}->(@args);
+         } catch {
+            print colored("Расширение '$ext->{name}': $_", "red");
+         };
       }
    };
 }

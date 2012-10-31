@@ -8,7 +8,6 @@ use Term::ANSIColor qw/color colored/;
 
 use Piston::Extensions;
 use Yoba;
-use Boards::Nullchan;
 
 extension(
    name => "Информер",

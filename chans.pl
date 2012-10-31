@@ -2,7 +2,7 @@
 
 our $chans = {
    nullchan => {
-      url  => "http://0chan.ru/",
+      url  => "http://0chan.hk/",
       engine => "nullchan",
       captcha => "png",
       tesseract => ["eng", "eng_lowcase"],

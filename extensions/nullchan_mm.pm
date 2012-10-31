@@ -21,7 +21,6 @@ sub gen_mm {
    if($Piston::config->{postform}->{text} || $Piston::config->{postform}->{text_mode} || $Piston::config->{postform}->{password}) {
       my $cmd = shell_quote("0$$wipe{postform}{text}$$Piston::config{postform}{password}");
       $mm = `./mm $cmd`;
-      warn $@ if $@;
       warn "Не удалось сгенерировать mm" unless $mm;
    }
    #----------------------------------------

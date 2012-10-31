@@ -63,7 +63,7 @@ Carp::croak "Не найден mp3-файл.\n"   unless -f $opt->{voice};
 mkpath($opt->{tmpdir});
 
 my $lwp = new Yoba::LWP;
-$lwp->referer("http://www.0chan.ru/");
+$lwp->referer("http://0chan.hk/");
 
 if($opt->{crop}) {
    say "Нарезаем картинку '$$opt{image}':";
@@ -116,7 +116,7 @@ if($opt->{upload} || $opt->{old}) {
 sub upload {
    my($fname) = @_;
    #----------------------------------------
-   my $res = $lwp->post("http://www.0chan.ru/voice.php",
+   my $res = $lwp->post("http://0chan.hk/voice.php",
       Content_Type => "form-data",
       Content => [
          voice  => [$opt->{voice}],

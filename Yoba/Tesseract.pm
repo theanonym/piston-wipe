@@ -50,11 +50,12 @@ sub tesseract($;$$) {
    Carp::carp $? if $code;
    #----------------------------------------
    my $text = "";
-   eval {
+   try {
       $text = read_file("$tmpfile.txt");
       unlink($tmpfile, "$tmpfile.txt");
+   } catch {
+      Carp::carp $_;
    };
-   Carp::carp $@ if $@;
    $text =~ s/^\s+|\s+$//g;
    #say "Распознано: $text";
    return $text;

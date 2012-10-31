@@ -23,7 +23,7 @@ use Time::Local qw/timelocal/;
 
 our $boards = {
    main => [qw/b vg/],
-   all  => [qw/a au cook fa fl m med ne ph tv wp war h fur/],
+   all  => [qw/a au cook fa fl m med ne ph tv wp war h fur i nhk/],
    geek => [qw/t e hw s c 8 bg wh bo co f/]
 };
 
@@ -35,7 +35,7 @@ our $boards = {
 # <- string
 sub get_board_page($$) {
    my($board, $page) = @_;
-   my $url = "http://0chan.ru/$board/" . ($page ? "$page.html" : "");
+   my $url = "http://0chan.hk/$board/" . ($page ? "$page.html" : "");
    return Yoba::http_get($url);
 }
 
@@ -43,14 +43,14 @@ sub get_board_page($$) {
 # <- string
 sub get_thread_page($$) {
    my($board, $thread) = @_;
-   return Yoba::http_get("http://0chan.ru/$board/res/$thread.html");
+   return Yoba::http_get("http://0chan.hk/$board/res/$thread.html");
 }
 
 # -> string
 # <- string
 sub get_catalog_page($) {
    my($board) = @_;
-   return Yoba::http_get("http://0chan.ru/$board/catalog.html");
+   return Yoba::http_get("http://0chan.hk/$board/catalog.html");
 }
 
 # -> string
@@ -88,7 +88,7 @@ sub parse_post_refs($){
 # <- (string)
 sub parse_image_links($) {
    my($html) = @_;
-   my @res = $html =~ m~http://(?:img.)?0chan.ru/\w+/src/\w+\.\w+~g;
+   my @res = $html =~ m~http://(?:img.)?0chan.hk/\w+/src/\w+\.\w+~g;
    Yoba::array_unique(\@res);
    return @res;
 }
@@ -118,7 +118,7 @@ sub count_posts($$) {
 sub check_thread_exists($$) {
    my($board, $thread) = @_;
    my $lwp = new Yoba::LWP;
-   return $lwp->head("http://0chan.ru/$board/res/$thread.html")->code;
+   return $lwp->head("http://0chan.hk/$board/res/$thread.html")->code;
 }
 
 # -> string
@@ -134,8 +134,8 @@ sub get_last_post($) {
 sub delete_post($$$) {
    my($board, $post, $pass) = @_;
    my $lwp = new Yoba::LWP(timeout => 20);
-   $lwp->referer("http://0chan.ru/");
-   my $res = $lwp->post("http://www.0chan.ru/board.php",
+   $lwp->referer("http://0chan.hk/");
+   my $res = $lwp->post("http://0chan.hk/board.php",
       Content_Type => "application/x-www-form-urlencoded",
       Content => "board=$board&delete=$_&postpassword=$pass",
    );
