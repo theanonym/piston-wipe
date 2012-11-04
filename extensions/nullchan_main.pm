@@ -41,6 +41,7 @@ sub check_catalog {
 
 sub postcount {
    for my $thread (@Piston::threads) {
+      next if $thread == 0;
       say colored("Постов в треде /$Piston::config->{board}/$thread: ", "cyan"),
          colored($Piston::shared->{catalog}->{$thread}, "yellow");
    }
@@ -48,6 +49,7 @@ sub postcount {
 
 sub check_bumplimit {
    for my $thread (@Piston::threads) {
+      next if $thread == 0;
       if($Piston::shared->{catalog}->{$thread} >= 500) {
          Piston::delete_thread($thread);
          say colored("Тред $thread удалён из целей (бамплимит)", "cyan");
