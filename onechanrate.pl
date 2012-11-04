@@ -17,7 +17,7 @@ use Coro::AnyEvent;
 
 my $opt = {
    rate    => 1,
-   count   => 50,
+   count   => 100,
    skip    => 0,
 
    tmpdir    => catdir(tmpdir, "piston_wipe", "onechan_rate"),
