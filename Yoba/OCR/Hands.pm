@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use Carp;
 
-use base "Exporter"; our @EXPORT = qw/get_ocr/;
+use base "Exporter";
+our @EXPORT = qw/get_ocr/;
 
 #use Gtk2 -init;
 
@@ -15,6 +16,7 @@ use Yoba;
 # <- string
 sub get_ocr($;@) {
    my($file, $title) = @_;
+   $title ||= "";
    my $cmd = qq~./captcha $file $title~;
    return `$cmd`;
 }

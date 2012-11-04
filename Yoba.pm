@@ -23,6 +23,7 @@ use File::Spec::Functions qw/catfile tmpdir/;
 use File::Find;
 use String::ShellQuote qw/shell_quote/;
 use Params::Check;
+use Try::Tiny;
 
 use Yoba::LWP;
 
@@ -268,24 +269,6 @@ sub parse_proxies($) {
       push @result, $proxy unless $ips{$ip}++;
    }
    return map { setscheme($_) } @result;
-}
-
-# -> sub, (sub)
-# <- (any)
-sub try(&@) {
-   my($try, $catch) = @_;
-   my @ret = eval { $try->() };
-   if($@) {
-      local $_ = $@;
-      $catch->();
-   }
-   return @ret;
-}
-
-# -> sub
-# <- sub
-sub catch(&) {
-   return $_[0];
 }
 
 2;
