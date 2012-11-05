@@ -43,6 +43,8 @@ sub CONSTRUCT {
    );
    if($Piston::config->{ocr_mode} =~ /tesse?r?a?c?t?/) {
       push @args, (args => $Piston::config->{thischan}->{tesseract});
+   } elsif($Piston::config->{ocr_mode} =~ /antigate/) {
+      push @args, (args => $Piston::config->{thischan}->{antigate});
    }
    $self->{captcha} = new Yoba::OCR(@args);
    #----------------------------------------

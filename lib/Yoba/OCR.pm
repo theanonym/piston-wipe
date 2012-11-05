@@ -16,11 +16,11 @@ sub CONSTRUCT {
    my $self = shift;
    given($self->{mode}) {
       when(/hands?/) {
-         eval "use Yoba::OCR::Hands; 1" or Carp::croak $@;
+         eval "use Yoba::OCR::Hands; 1" or die $@;
       } when(/tesse?r?a?c?t?/) {
-         eval "use Yoba::OCR::Tesseract; 1" or Carp::croak $@;
+         eval "use Yoba::OCR::Tesseract; 1" or die $@;
       } when(/antigate/) {
-         eval "use Yoba::OCR::Antigate; 1" or Carp::croak $@;
+         require Yoba::OCR::Antigate;
       } default {
          Carp::croak "Неверный режим";
       }
@@ -41,12 +41,29 @@ sub run(@) {
    my(@args) = @_;
    # $self->{args} = \@args if @args;
 
-   unless($self->has_file) { Carp::croak "Нет файла капчи" };
-   if($self->{mode} =~ /tesse?r?a?c?t?/) {
-      $self->{text} = get_ocr($self->{file}, @{ $self->{args} });
-   } else {
-      $self->{text} = get_ocr($self->{file}, @args);
+   unless($self->has_file) {
+      Carp::croak "Нет файла капчи";
+   };
+
+   given($self->{mode}) {
+      when(/hands?/) {
+         $self->{text} = get_ocr($self->{file}, @args);
+      }
+
+      when(/tesse?r?a?c?t?/) {
+         $self->{text} = get_ocr($self->{file}, @{ $self->{args} });
+      }
+
+      when(/antigate/) {
+         my $ag = new Yoba::OCR::Antigate(%{ $self->{args} });
+         say "Отправка капчи на antigate.com";
+         my $id = $ag->send_captcha($self->{file});
+         say "Ожидание ответа antigate.com";
+         $self->{text} = $ag->get_ocr($id);
+         say "Ответ antigate.com получен";
+      }
    }
+
    return $self->{text};
 }
 

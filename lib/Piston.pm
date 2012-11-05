@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.6.6";
+   our $VERSION = "2.6.7";
    our $opt;
 
    require "config/config.pl";
@@ -201,21 +201,35 @@ sub wipe_func_2($) {
 
          $captcha_pool->start_all;
          $captcha_pool->join_all;
+
+         @wipes = grep { !$Piston::config->{thischan}->{captcha} || $_->{captcha}->has_file } @wipes;
+
+         # Ввод капч
+         my @antigate_threads;
+
+         my $count = @wipes;
+         my $i = 1;
+         map {
+            my $wipe = $_;
+            $errors{$wipe->{proxy}} = -1;
+
+            if($Piston::config->{ocr_mode} =~ /antigate/) {
+               push @antigate_threads, Coro::async {
+                  $wipe->run_ocr("$i/$count");
+               };
+            } else {
+               $wipe->run_ocr("$i/$count");
+               $i++;
+               $wipe->log(3, "КАПЧА", "Капча не введена!") unless $wipe->{captcha}->is_entered;
+            }
+         } @wipes;
+
+         if($Piston::config->{ocr_mode} =~ /antigate/ && @antigate_threads) {
+            $_->join for @antigate_threads;
+         }
+
+         @wipes = grep { $_->{captcha}->is_entered } @wipes;
       }
-
-      @wipes = grep { !$Piston::config->{thischan}->{captcha} || $_->{captcha}->has_file } @wipes;
-
-      # Ввод капч
-      my $count = @wipes;
-      my $i = 1;
-      map {
-         $errors{$_->{proxy}} = -1;
-         $_->run_ocr("$i/$count");
-         $i++;
-         $_->log(3, "КАПЧА", "Капча не введена!") unless $_->{captcha}->is_entered;
-      } @wipes;
-
-      @wipes = grep { $_->{captcha}->is_entered } @wipes;
 
       # Отправка постов
       my $posting_pool = new Yoba::Coro::Pool(

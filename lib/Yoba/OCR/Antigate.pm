@@ -60,13 +60,13 @@ sub send_captcha($)
    }
    else
    {
-      die $res->content;
+      warn $res->content;
    }
 }
 
 # -> string
 # <- string
-sub get_text($)
+sub get_ocr($)
 {
    my $self = shift;
    my($id) = @_;
@@ -84,7 +84,7 @@ sub get_text($)
       }
       else
       {
-         die $res->content;
+         warn $res->content;
       }
    }
 }

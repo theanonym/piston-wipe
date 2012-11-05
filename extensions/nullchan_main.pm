@@ -34,7 +34,7 @@ sub check_catalog {
    try {
       %catalog = parse_threads_table(get_catalog_page($Piston::config->{board}));
    } catch {
-      warn;
+      warn "$_\n";
    };
    $Piston::shared->{catalog} = \%catalog;
 }
@@ -50,6 +50,7 @@ sub postcount {
 sub check_bumplimit {
    for my $thread (@Piston::threads) {
       next if $thread == 0;
+      next unless defined $Piston::shared->{catalog}->{$thread}; #TODO Заглушка
       if($Piston::shared->{catalog}->{$thread} >= 500) {
          Piston::delete_thread($thread);
          say colored("Тред $thread удалён из целей (бамплимит)", "cyan");
