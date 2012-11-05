@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Carp;
 
+use lib "lib";
+
 use File::Slurp qw/write_file/;
 use List::Util qw/shuffle/;
 
@@ -59,11 +61,11 @@ HLP
 Carp::croak "Не удалось найти файл '$opt->{infile}'" unless -f $opt->{infile};
 
 my @proxies = Yoba::read_proxylist($opt->{infile});
+my @ignore = Yoba::read_proxylist($opt->{outfile}) if -f $opt->{outfile};
 if($opt->{skip}) {
-   my @ignore = Yoba::read_proxylist($opt->{skip}) if -f $opt->{skip};
-   push @ignore, Yoba::read_proxylist($opt->{outfile}) if -f $opt->{outfile};
-   @proxies = grep { not $_ ~~ @ignore } @proxies;
+   push @ignore, Yoba::read_proxylist($opt->{skip}) if -f $opt->{skip};
 }
+@proxies = grep { not $_ ~~ @ignore } @proxies;
 @proxies = shuffle @proxies;
 
 my @result;

@@ -74,6 +74,7 @@ sub get_ocr($)
    while(1)
    {
       my $res = $lwp->get("http://antigate.com/res.php?key=$$self{key}&action=get&id=$id");
+
       if($res->content =~ /^OK\|(.*)/)
       {
          return $1;
@@ -85,6 +86,7 @@ sub get_ocr($)
       else
       {
          warn $res->content;
+         return;
       }
    }
 }
