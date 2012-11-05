@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.6.5";
+   our $VERSION = "2.6.6";
    our $opt;
 
    require "config/config.pl";
@@ -98,6 +98,7 @@ sub run {
    given($Piston::config->{wipe_mode}) {
       when(1) {
          my $pool = new Yoba::Coro::Pool(
+            debug     => 1,
             desc      => "wipe",
             params    => \@proxies,
             function  => \&wipe_func_1,
@@ -106,6 +107,7 @@ sub run {
          $pool->start_all;
       } when(2) {
          my $main_thread = new Yoba::Coro(
+            debug     => 1,
             desc     => "wipe",
             param    => \@proxies,
             function => \&wipe_func_2,

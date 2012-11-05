@@ -116,12 +116,23 @@ sub CONSTRUCT {
    #----------------------------------------
    # Картинка
    given($Piston::config->{postform}->{images_mode}) {
-      when("folder")  { $self->{file} = $files[rand @files] }
+      when("folder") {
+         $self->{file} = $files[rand @files];
+      }
+
       when("video") {
          if(@videos) {
             $self->{video} = pop @videos;
          } else {
             Carp::carp "Видео закончились";
+         }
+      }
+
+      when("captcha") {
+         if(-s $self->{wipe}->{captcha}->{file}) {
+            $self->{file} = $self->{wipe}->{captcha}->{file};
+         } else {
+            Carp::carp "Не удалось найти файл капчи, чтобы его запостить";
          }
       }
    }

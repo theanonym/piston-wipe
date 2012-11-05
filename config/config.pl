@@ -15,7 +15,7 @@ our $config = {
 
    postform => {
       text_mode   => "",
-      images_mode => "",
+      images_mode => "captcha",
 
       randreply => 0,
 
