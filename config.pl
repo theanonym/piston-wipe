@@ -3,7 +3,7 @@ our $config = {
 
    bumpmode   => 0,
    five_posts => 0,
-   ocr_mode   => "tesseract",
+   ocr_mode   => "hands",
 
    wipe_mode => 1,
    use_proxy => 1,
