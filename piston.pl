@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Carp;
 
+use lib "lib";
+
 use Term::ANSIColor qw/color colored/;
 
 use Piston;

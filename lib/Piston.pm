@@ -29,8 +29,8 @@ BEGIN {
    our $VERSION = "2.6.3";
    our $opt;
 
-   require "config.pl";
-   require "chans.pl";
+   require "config/config.pl";
+   require "config/chans.pl";
 
    require Piston::Extensions;
 

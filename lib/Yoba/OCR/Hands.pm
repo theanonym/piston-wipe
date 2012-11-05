@@ -17,7 +17,7 @@ use Yoba;
 sub get_ocr($;@) {
    my($file, $title) = @_;
    $title ||= "";
-   my $cmd = qq~./captcha $file $title~;
+   my $cmd = qq~./bin/captcha $file $title~;
    return `$cmd`;
 }
 
