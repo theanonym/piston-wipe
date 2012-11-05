@@ -37,11 +37,14 @@ sub CONSTRUCT {
    $self->{lwp}->proxy($self->{proxy}) if $self->{proxy};
    $self->{lwp}->cookie_jar({});
    #----------------------------------------
-   $self->{captcha} = new Yoba::OCR(
+   my @args = (
       mode   => $Piston::config->{ocr_mode},
       delete => 1,
-      args   => $Piston::config->{thischan}->{tesseract},
    );
+   if($Piston::config->{ocr_mode} =~ /tesse?r?a?c?t?/) {
+      push @args, (args => $Piston::config->{thischan}->{tesseract});
+   }
+   $self->{captcha} = new Yoba::OCR(@args);
    #----------------------------------------
    if($Piston::config->{pregen}) {
       $self->set_board;
