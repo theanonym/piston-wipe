@@ -1,8 +1,6 @@
 our $config = {
    enable_extensions => 1,
 
-   bumpmode   => 0,
-   five_posts => 0,
    ocr_mode   => "hands",
 
    wipe_mode => 1,
@@ -39,10 +37,10 @@ our $config = {
    max_connections => 300,
 
    captcha_timelimit => 30.00,
-   post_timelimit    => 10.00,
-   captcha_attempts  => 2,
-   post_attempts     => 1,
-   errors_limit      => 5,
+   post_timelimit    => 20.00,
+   captcha_attempts  => 3,
+   post_attempts     => 3,
+   errors_limit      => 20,
 
    loglevel => 4,
 };

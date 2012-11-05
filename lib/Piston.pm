@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.6.4";
+   our $VERSION = "2.6.5";
    our $opt;
 
    require "config/config.pl";
@@ -95,15 +95,25 @@ sub init {
 }
 
 sub run {
-   my $p;
-   if($Piston::config->{wipe_mode} == 1) {
-      $p = new Yoba::Coro::Pool(
-         desc => "wipe",
-         params  => \@proxies,
-         function    => \&wipe_func_1,
-      );
+   given($Piston::config->{wipe_mode}) {
+      when(1) {
+         my $pool = new Yoba::Coro::Pool(
+            desc      => "wipe",
+            params    => \@proxies,
+            function  => \&wipe_func_1,
+         );
+
+         $pool->start_all;
+      } when(2) {
+         my $main_thread = new Yoba::Coro(
+            desc     => "wipe",
+            param    => \@proxies,
+            function => \&wipe_func_2,
+         );
+
+         $main_thread->start;
+      }
    }
-   $p->start_all;
 
    while(1) {
       Piston::sleep_this_thread(2);
@@ -116,9 +126,8 @@ sub run {
 sub wipe_func_1($) {
    my($proxy) = @_;
    $errors{$proxy} = 0;
-    main: while($errors{$proxy} < $Piston::config->{errors_limit}) {
-    #main: while(1) {
-      my $wipe = new Piston::Wipe(proxy => $proxy);
+   main: while( $errors{$proxy} < $Piston::config->{errors_limit} ) {
+      my $wipe = new Piston::Wipe( proxy => $proxy );
       #----------------------------------------
       #unless($Piston::config->{pregen}) {
          unless(@threads) {
@@ -157,6 +166,70 @@ sub wipe_func_1($) {
    return;
 }
 
+# -> [string]
+sub wipe_func_2($) {
+   my($proxies) = @_;
+
+   map { $errors{$_} = 0; } @$proxies;
+
+   main: while(1) {
+      my @wipes = map {
+         new Piston::Wipe(proxy => $_);
+      } grep {
+         my $bad_proxy = $errors{$_} >= $Piston::config->{errors_limit};
+         do {
+            say colored("$_ завершено (лимит ошибок)", "cyan");
+            $killed_threads++;
+         } if $bad_proxy && $errors{$_} != -1;
+         !$bad_proxy;
+      } @$proxies;
+
+      last main unless @wipes;
+
+      if($Piston::config->{thischan}->{captcha}) {
+         # Загрузка капч
+         my $captcha_pool = new Yoba::Coro::Pool(
+            debug => 1,
+            desc     => "captcha",
+            params   => \@wipes,
+            timelimit => $Piston::config->{captcha_timelimit},
+            semaphore => $captcha_semaphore,
+            function => \&get_captcha_func,
+         );
+
+         $captcha_pool->start_all;
+         $captcha_pool->join_all;
+      }
+
+      @wipes = grep { !$Piston::config->{thischan}->{captcha} || $_->{captcha}->has_file } @wipes;
+
+      # Ввод капч
+      my $count = @wipes;
+      my $i = 1;
+      map {
+         $errors{$_->{proxy}} = -1;
+         $_->run_ocr("$i/$count");
+         $i++;
+         $_->log(3, "КАПЧА", "Капча не введена!") unless $_->{captcha}->is_entered;
+      } @wipes;
+
+      @wipes = grep { $_->{captcha}->is_entered } @wipes;
+
+      # Отправка постов
+      my $posting_pool = new Yoba::Coro::Pool(
+         debug => 1,
+         desc     => "post",
+         params   => \@wipes,
+         timelimit => $Piston::config->{post_timelimit},
+         semaphore => $post_semaphore,
+         function => \&send_post_func,
+      );
+
+      $posting_pool->start_all;
+      $posting_pool->join_all;
+   }
+}
+
 #--------------------------------------------------------------------------------
 
 #----------------------------------------
@@ -168,12 +241,12 @@ sub wipe_func_1($) {
 sub get_captcha($) {
    my($wipe) = @_;
    return new Yoba::Coro(
-      debug => 0,
-      desc => "captcha",
-      timelimit   => $Piston::config->{captcha_timelimit},
-      semaphore   => $captcha_semaphore,
-      param   => $wipe,
-      function    => \&get_captcha_func,
+      debug     => 1,
+      desc      => "captcha",
+      timelimit => $Piston::config->{captcha_timelimit},
+      semaphore => $captcha_semaphore,
+      param     => $wipe,
+      function  => \&get_captcha_func,
    );
 }
 
@@ -182,8 +255,8 @@ sub get_captcha($) {
 sub send_post($) {
    my($wipe) = @_;
    return new Yoba::Coro(
-      debug => 0,
-      desc => "post",
+      debug     => 1,
+      desc      => "post",
       timelimit => $Piston::config->{post_timelimit},
       semaphore => $post_semaphore,
       param     => $wipe,

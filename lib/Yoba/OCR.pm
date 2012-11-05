@@ -42,7 +42,11 @@ sub run(@) {
    # $self->{args} = \@args if @args;
 
    unless($self->has_file) { Carp::croak "Нет файла капчи" };
-   $self->{text} = get_ocr($self->{file}, @{ $self->{args} });
+   if($self->{mode} =~ /tesse?r?a?c?t?/) {
+      $self->{text} = get_ocr($self->{file}, @{ $self->{args} });
+   } else {
+      $self->{text} = get_ocr($self->{file}, @args);
+   }
    return $self->{text};
 }
 
