@@ -4,6 +4,8 @@ use 5.10.1;
 use strict;
 use warnings;
 
+use lib "lib";
+
 use File::Slurp qw/read_file write_file/;
 use File::Path qw/rmtree mkpath/;
 use File::Spec::Functions qw/catfile catdir tmpdir/;
