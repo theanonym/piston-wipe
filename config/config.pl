@@ -7,7 +7,9 @@ our $config = {
 
    use_proxy => 1,
    proxylist => "",
-   max_proxies => 0,
+
+   proxies_max    => 0,
+   proxies_ignore => 0,
 
    chan    => "nullchan",
    board   => "b",
