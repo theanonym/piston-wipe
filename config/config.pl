@@ -3,9 +3,11 @@ our $config = {
 
    ocr_mode   => "hands",
 
-   wipe_mode => 1,
+   wipe_mode => 2,
+
    use_proxy => 1,
    proxylist => "",
+   max_proxies => 0,
 
    chan    => "nullchan",
    board   => "b",

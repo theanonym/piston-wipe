@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.6.7";
+   our $VERSION = "2.6.8";
    our $opt;
 
    require "config/config.pl";
@@ -362,6 +362,7 @@ sub load_proxies {
       @proxy = grep { not $_ ~~ @ignore } @proxy;
    }
    #----------------------------------------
+   @proxy = splice(@proxy, 0, $Piston::config->{max_proxies}) if $Piston::config->{max_proxies};
    if(@proxy) {
       #TODO s/(\d+)/color("yellow") . $1 . color("reset")/ge
       say colored(scalar(@proxy), "yellow"),
