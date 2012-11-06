@@ -1,0 +1,2 @@
+Чтобы использовать тессеракт в полной мере, нужно найти путь к его конфигам (где-то в "/usr/share/tesseract/tessdata/configs" или "/usr/local/share/tessdata/configs/", проще всего найти командой "find /usr -type d -name tessdata") и скопировать туда (tessdata/configs) эти файлы.
+Затем в конфиге борды указать язык и имя одного из файлов (примеры: tesseract => ["eng", "eng_lowcase"] или tesseract => ["rus", "rus_lowcase"]), по именам файлов понятно их назначение.
