@@ -1,6 +1,6 @@
 package Piston::Engines::Nullchan;
 
-use 5.10.1;
+use 5.010;
 use strict;
 use warnings;
 use Carp;
