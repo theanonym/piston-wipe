@@ -26,6 +26,7 @@ my $opt = {
    threads  => 500,
    time     => 20,
    attempts => 1,
+   wait     => 3,
 };
 
 GetOptions($opt,
