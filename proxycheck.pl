@@ -102,7 +102,7 @@ sub check_func {
             @result = ();
          }
          return $proxy . ": " . sprintf("+ %s +", $response->status_line);
-      } elsif($_ == $opt->{attempts}) {
+      } elsif($_ >= $opt->{attempts}) {
          return $proxy . ": " . $response->status_line;
       } else {
          Coro::AnyEvent::sleep $opt->{wait};

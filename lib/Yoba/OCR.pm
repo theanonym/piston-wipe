@@ -15,7 +15,7 @@ has "text";
 sub CONSTRUCT {
    my $self = shift;
    given($self->{mode}) {
-      when(/hands?/) {
+      when(/hands/) {
          eval "use Yoba::OCR::Hands; 1" or die $@;
       } when(/tesse?r?a?c?t?/) {
          eval "use Yoba::OCR::Tesseract; 1" or die $@;
@@ -46,8 +46,9 @@ sub run(@) {
    };
 
    given($self->{mode}) {
-      when(/hands?/) {
-         $self->{text} = get_ocr($self->{file}, @args);
+      when(/hands/) {
+         my $type = $self->{mode} =~ /hands(.*)/;
+         $self->{text} = get_ocr($1, $self->{file}, @args);
       }
 
       when(/tesse?r?a?c?t?/) {
@@ -69,7 +70,7 @@ sub run(@) {
 
 # -> string, (any)
 # <- string
-sub get_ocr($;@) {
+sub get_ocr {
    Carp::croak "Метод не определён";
 }
 

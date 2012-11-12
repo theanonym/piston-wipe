@@ -13,7 +13,7 @@ use Yoba::Tesseract;
 
 # -> string
 # <- string
-sub get_ocr($;@) {
+sub get_ocr {
    my($file, @args) = @_;
    @args = ("eng", "eng_all") unless @args;
    my $text = tesseract($file, $args[0], $args[1]);

@@ -14,10 +14,17 @@ use Yoba;
 
 # -> string, string
 # <- string
-sub get_ocr($;@) {
-   my($file, $title) = @_;
+sub get_ocr {
+   my($type, $file, $title) = @_;
    $title ||= "";
-   my $cmd = qq~./bin/captcha $file $title~;
+   my $cmd;
+   if($type eq "qt") {
+      $cmd = qq~./bin/qt_captcha $file $title~;
+   } elsif($type eq "gtk") {
+      $cmd = qq~./bin/gtk_captcha $file $title~;
+   } else {
+      Carp::croak $type;
+   }
    return `$cmd`;
 }
 
