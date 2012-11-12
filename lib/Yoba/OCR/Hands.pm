@@ -20,10 +20,8 @@ sub get_ocr {
    my $cmd;
    if($type eq "qt") {
       $cmd = qq~./bin/qt_captcha $file $title~;
-   } elsif($type eq "gtk") {
+   } elsif($type eq "gtk" || 1) {
       $cmd = qq~./bin/gtk_captcha $file $title~;
-   } else {
-      Carp::croak $type;
    }
    return `$cmd`;
 }

@@ -48,7 +48,7 @@ sub run(@) {
    given($self->{mode}) {
       when(/hands/) {
          my $type = $self->{mode} =~ /hands(.*)/;
-         $self->{text} = get_ocr($1, $self->{file}, @args);
+         $self->{text} = get_ocr($1 || "", $self->{file}, @args);
       }
 
       when(/tesse?r?a?c?t?/) {
