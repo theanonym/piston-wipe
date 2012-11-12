@@ -2,6 +2,7 @@
 #define FORM_HPP
 
 #include <QWidget>
+#include <QRegExpValidator>
 #include <iostream>
 
 #include "ui_form.h"
@@ -17,6 +18,7 @@ public:
 
    void setFile(const QString &);
    void setTitle(const QString &);
+   void setWhiteList(const QString &);
 
 private slots:
    void updateCount(const QString &);

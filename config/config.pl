@@ -1,7 +1,7 @@
 our $config = {
    enable_extensions => 1,
 
-   ocr_mode   => "hands",
+   ocr_mode   => "handsgtk",
 
    wipe_mode => 2,
 

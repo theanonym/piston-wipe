@@ -9,6 +9,7 @@ int main(int argc, char ** argv)
 
    QString fname;
    QString title;
+   QString whitelist;
 
    if(argc < 2)
       return -1;
@@ -24,9 +25,14 @@ int main(int argc, char ** argv)
    else
       title = "Captcha";
 
+   if(argc > 3)
+      whitelist = QString::fromUtf8(argv[3]);
+
    Form form;
    form.setTitle(title);
    form.setFile(fname);
+   if(!whitelist.isNull())
+      form.setWhiteList(whitelist);
    form.show();
 
    return app.exec();

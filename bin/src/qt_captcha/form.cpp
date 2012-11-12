@@ -20,6 +20,11 @@ void Form::setTitle(const QString & title)
    setWindowTitle(title);
 }
 
+void Form::setWhiteList(const QString & chars)
+{
+   ui.line1->setValidator(new QRegExpValidator(QRegExp("[" + chars + "]*"), this));
+}
+
 void Form::updateCount(const QString & text)
 {
    ui.label2->setText(QString::number(text.length()));

@@ -180,6 +180,12 @@ sub after_post() {
 sub run_ocr(@) {
    my $self = shift;
    my(@args) = @_;
+
+   #FIXME Работает, пока эти аргументы используются только с ручным вводом
+   if($Piston::config->{thischan}->{captcha}->{chars}) {
+      push @args, $Piston::config->{thischan}->{captcha}->{chars};
+   }
+
    $self->{captcha}->run(@args);
    return $self->{captcha}->is_entered;
 }

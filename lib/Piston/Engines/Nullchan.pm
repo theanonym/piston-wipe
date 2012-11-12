@@ -86,7 +86,7 @@ sub handle_captcha_response($) {
    my $response = $wipe->{captcha_response};
    my($error, $code);
    #----------------------------------------
-   my $fmt = $Piston::config->{thischan}->{captcha};
+   my $fmt = $Piston::config->{thischan}->{captcha}->{type};
    if(exists $response->{_headers}->{"content-type"}
       && $response->{_headers}->{"content-type"} =~ /image\/$fmt/) {
       write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");

@@ -15,11 +15,12 @@ use Yoba;
 # -> string, string
 # <- string
 sub get_ocr {
-   my($type, $file, $title) = @_;
+   my($type, $file, $title, $whitelist) = @_;
    $title ||= "";
+   $whitelist ||= "";
    my $cmd;
    if($type eq "qt") {
-      $cmd = qq~./bin/qt_captcha $file $title~;
+      $cmd = qq~./bin/qt_captcha $file $title $whitelist~;
    } elsif($type eq "gtk" || 1) {
       $cmd = qq~./bin/gtk_captcha $file $title~;
    }

@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.7.0";
+   our $VERSION = "2.7.1";
    our $opt;
 
    require "config/config.pl";
@@ -353,6 +353,7 @@ sub kill_this_thread {
 sub load_proxies {
    return unless $Piston::config->{use_proxy};
    my $fname = $Piston::config->{proxylist};
+   die "Не найден проксилист '$Piston::config->{proxylist}'" unless -f $Piston::config->{proxylist};
    my @proxy = Yoba::read_proxylist($fname);
    my $all = @proxy;
    #----------------------------------------
