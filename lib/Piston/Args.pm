@@ -230,11 +230,13 @@ if(my @arg = @{ $opt->{delete} }) {
    die "Нет пароля" unless defined $pass;
    if(@arg == 2) {
       my($board, $post) = @arg;
-      delete_post($board, $post, $pass);
+      say "del $post";
+      say "ok" if delete_post($board, $post, $pass);
    } else {
-      my($board, $first, $last) = @_;
+      my($board, $first, $last) = @arg;
       for my $post ($first .. $last) {
-         delete_post($board, $post, $pass);
+         say "del $post";
+         say "ok" if delete_post($board, $post, $pass);
          Coro::AnyEvent::sleep(5);
       }
    }

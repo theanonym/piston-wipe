@@ -4,10 +4,10 @@ TARGET = qt_captcha
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    form.cpp
+    captcha.cpp
 
 HEADERS  += \
-    form.hpp
+    captcha.hpp
 
 FORMS += \
     form.ui

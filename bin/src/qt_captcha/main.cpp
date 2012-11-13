@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QFile>
 
-#include "form.hpp"
+#include "captcha.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -28,12 +28,12 @@ int main(int argc, char ** argv)
    if(argc > 3)
       whitelist = QString::fromUtf8(argv[3]);
 
-   Form form;
-   form.setTitle(title);
-   form.setFile(fname);
+   Captcha captcha;
+   captcha.setTitle(title);
+   captcha.setFile(fname);
    if(!whitelist.isNull())
-      form.setWhiteList(whitelist);
-   form.show();
+      captcha.setWhiteList(whitelist);
+   captcha.show();
 
    return app.exec();
 }

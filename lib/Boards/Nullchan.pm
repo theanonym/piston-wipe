@@ -134,11 +134,13 @@ sub get_last_post($) {
 sub delete_post($$$) {
    my($board, $post, $pass) = @_;
    my $lwp = new Yoba::LWP(timeout => 20);
+   $lwp->agent("Opera/9.80 (X11; Linux i686; U; en) Presto/2.10.289 Version/12.00");
    $lwp->referer("http://0chan.hk/");
    my $res = $lwp->post("http://0chan.hk/board.php",
       Content_Type => "application/x-www-form-urlencoded",
-      Content => "board=$board&delete=$_&postpassword=$pass",
+      Content => "board=$board&delete=$post&postpassword=$pass",
    );
+   say $res->as_string;
    return $res->{_content} =~ /Сообщение удалено/;
 }
 

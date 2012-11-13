@@ -7,14 +7,14 @@
 
 #include "ui_form.h"
 
-class Form : public QWidget
+class Captcha : public QWidget
 {
    Q_OBJECT
 
    Ui::Form ui;
 
 public:
-   Form(QWidget * parent = 0);
+   Captcha(QWidget * parent = 0);
 
    void setFile(const QString &);
    void setTitle(const QString &);
