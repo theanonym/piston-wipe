@@ -98,7 +98,7 @@ sub run {
    given($Piston::config->{wipe_mode}) {
       when(1) {
          my $pool = new Yoba::Coro::Pool(
-            debug     => 1,
+            debug     => 0,
             desc      => "wipe",
             params    => \@proxies,
             function  => \&wipe_func_1,
@@ -107,7 +107,7 @@ sub run {
          $pool->start_all;
       } when(2) {
          my $main_thread = new Yoba::Coro(
-            debug     => 1,
+            debug     => 0,
             desc     => "wipe",
             param    => \@proxies,
             function => \&wipe_func_2,
@@ -191,7 +191,7 @@ sub wipe_func_2($) {
       if($Piston::config->{thischan}->{captcha}) {
          # Загрузка капч
          my $captcha_pool = new Yoba::Coro::Pool(
-            debug => 1,
+            debug => 0,
             desc     => "captcha",
             params   => \@wipes,
             timelimit => $Piston::config->{captcha_timelimit},
@@ -233,7 +233,7 @@ sub wipe_func_2($) {
 
       # Отправка постов
       my $posting_pool = new Yoba::Coro::Pool(
-         debug => 1,
+         debug => 0,
          desc     => "post",
          params   => \@wipes,
          timelimit => $Piston::config->{post_timelimit},
@@ -257,7 +257,7 @@ sub wipe_func_2($) {
 sub get_captcha($) {
    my($wipe) = @_;
    return new Yoba::Coro(
-      debug     => 1,
+      debug     => 0,
       desc      => "captcha",
       timelimit => $Piston::config->{captcha_timelimit},
       semaphore => $captcha_semaphore,
@@ -271,7 +271,7 @@ sub get_captcha($) {
 sub send_post($) {
    my($wipe) = @_;
    return new Yoba::Coro(
-      debug     => 1,
+      debug     => 0,
       desc      => "post",
       timelimit => $Piston::config->{post_timelimit},
       semaphore => $post_semaphore,
