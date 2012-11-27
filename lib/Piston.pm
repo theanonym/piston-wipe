@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.7.1";
+   our $VERSION = "2.7.2";
    our $opt;
 
    require "config/config.pl";
