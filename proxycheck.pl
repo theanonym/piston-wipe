@@ -9,7 +9,6 @@ use lib "lib";
 
 use File::Slurp qw/write_file/;
 use List::Util qw/shuffle/;
-
 use Getopt::Long qw/GetOptions/;
 
 eval "use LWP::Protocol::socks"; warn $@ if $@;

@@ -14,7 +14,7 @@ extension(
 );
 
 sub refresh {
-   my @target  = grep { $Piston::shared->{catalog}->{$_} <= 1 } keys %{ $Piston::shared->{catalog} };
+   my @target  = grep { $Piston::shared->{catalog}->{$_} == 0 } keys %{ $Piston::shared->{catalog} };
    printf "%d тредов найдено\n", 0+ @target;
    @Piston::threads = @target;
 }

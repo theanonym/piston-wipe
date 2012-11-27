@@ -237,7 +237,7 @@ if(my @arg = @{ $opt->{delete} }) {
       for my $post ($first .. $last) {
          say "del $post";
          say "ok" if delete_post($board, $post, $pass);
-         Coro::AnyEvent::sleep(5);
+         Coro::AnyEvent::sleep(2);
       }
    }
    exit;

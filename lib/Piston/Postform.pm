@@ -58,11 +58,11 @@ sub init {
    # Загрузка копипасты
    if($Piston::config->{postform}->{text_mode} eq "copypasta") {
       my $fname = "copypasta.txt";
-      my $file  = read_file($fname);
+      my $text  = read_file($fname);
       @copypasta = grep {
          s/^\s+|\s+$//g;
-         length $_ > 0 && length $_ <= 5000
-      } split(/\n---\n/, $file);
+         length $_ && length $_ <= 8000
+      } split(/\n\-+\n/, $text);
       if(@copypasta) {
          printf "%d блоков копипасты загружено из '$fname'.\n", scalar @copypasta;
       } else {
