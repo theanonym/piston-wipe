@@ -48,15 +48,20 @@ die "Не удалось создать папку для сжатых карт�
 
 my @files = Yoba::find_files(
    path      => $opt->{input},
-   regex     => qr/(jpg|png|gif)$/i,
+   regex     => qr/(jpe?g|png|gif)$/i,
    recursive => $opt->{recursive},
 );
 printf "Найдено %d файлов \n", 0+ @files;
 exit unless @files;
 
+my $count = @files;
+my $i = 0;
+
 for my $file (@files)
 {
-   say $file;
+   $i++;
+   say "($i/$count) $file";
+
    my $im = new Image::Magick;
    $im->Read($file);
 
