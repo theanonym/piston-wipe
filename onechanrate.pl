@@ -30,7 +30,7 @@ my $opt = {
 GetOptions($opt,
    "rate=s", "count=s", "skip=s",
    "thread=s", "proxylist=s", "tmpdir=s",
-   "ocr_mode=s",
+   "antigate=s",
    "clear" => sub { clear(); exit },
    "help"  => sub { print_help(); exit },
 );
@@ -43,15 +43,17 @@ Yoba onechan plusoner
    perl $0 [аргументы]
 
 Справка:
-   --ra(te)   | Голос (1 или 0)
-   --th(read) | Оцениваемый тред
+   --ra(te)     | Голос (1 или 0)
+   --th(read)   | Оцениваемый тред
 
-   --co(unt)  | Количество используемых прокси ($opt->{count} по умолчанию)
-   --sk(ip)   | Сколько прокси пропустить в начале файла
+   --co(unt)    | Количество используемых прокси ($opt->{count} по умолчанию)
+   --sk(ip)     | Сколько прокси пропустить в начале файла
 
-   --pr(oxy)  | Файл с прокси
+   --pr(oxy)    | Файл с прокси
 
-   --cl(ear)  | Удалить временные файлы
+   --an(tigate) | Ключ для антигейта
+
+   --cl(ear)    | Удалить временные файлы
 
 Примеры:
    --thread 1000000 --rate 1 --count 50  --proxylist proxies.txt
@@ -60,9 +62,12 @@ HLP
 
 #----------------------------------------
 
-Carp::croak("Файл с проски не указан или не существует") unless -f $opt->{proxylist};
+die "Файл с проски не указан или не существует" unless -f $opt->{proxylist};
 
 mkpath($opt->{tmpdir});
+if($opt->{antigate}) {
+   $opt->{ocr_mode} = "antigate";
+}
 
 my $lwp = new Yoba::LWP;
 $lwp->agent("Opera/9.80 (X11; Linux i686; U; en) Presto/2.10.289 Version/12.00");
@@ -77,14 +82,24 @@ printf "%d прокси загружено\n", scalar @proxies;
 my @captcha;
 for my $proxy (@proxies) {
    my $lwp = $lwp->clone;
-   $lwp->proxy($proxy);
+   $lwp->proxy($proxy) if $proxy;
    $lwp->cookie_jar({});
 
-   push @captcha, {
+   my $cap = {
       proxy => $proxy,
       lwp => $lwp,
-      captcha => new Yoba::OCR(mode => $opt->{ocr_mode}, delete => 1),
    };
+
+   if($opt->{ocr_mode} eq "antigate") {
+      $cap->{captcha} = new Yoba::OCR(
+         mode => $opt->{ocr_mode},
+         delete => 1,
+         args => { key => $opt->{antigate} },
+      );
+   } else {
+      $cap->{captcha} = new Yoba::OCR(mode => $opt->{ocr_mode}, delete => 1),
+   }
+   push @captcha, $cap;
 }
 
 #----------------------------------------
@@ -121,13 +136,22 @@ undef $threads;
 #----------------------------------------
 
 @captcha = grep { $_->{captcha}->has_file } @captcha;
-my $all = @captcha;
-my $count = 1;
-@captcha = grep {
-   $_->{captcha}->run("$count/$all");
-   $count++;
-   $_->{captcha}->is_entered;
-} @captcha;
+
+if($opt->{ocr_mode} eq "antigate") {
+   my @coros;
+   for my $c (@captcha) {
+      push @coros, Coro::async { $c->{captcha}->run };
+   }
+   $_->join for @coros;
+} else {
+   my $all = @captcha;
+   my $count = 1;
+   for(@captcha) {
+      $_->{captcha}->run("$count/$all");
+      $count++;
+   }
+}
+@captcha = grep { $_->{captcha}->is_entered } @captcha;
 
 #----------------------------------------
 
@@ -158,8 +182,8 @@ sub get_captcha($) {
    my($sessid) = $cap->{lwp}->cookie_jar->as_string =~ /(PHPSESSID=\w+)/;
    for(1 .. 3) {
       my $res = $cap->{lwp}->get("http://1chan.ru/captcha/?key=rate&$sessid");
-      if($res->headers->{"content-type"} =~ /image\/(\w+)/) {
-         my $fname = catfile($opt->{tmpdir}, substr(rand, -6) . ".$1");
+      if($res->headers->{"content-type"} && $res->headers->{"content-type"} =~ /image\/(\w+)/) {
+         my $fname = catfile($opt->{tmpdir}, substr(rand, -10) . ".$1");
          write_file($fname, $res->{_content});
          $cap->{captcha}->file($fname);
          return 1;
