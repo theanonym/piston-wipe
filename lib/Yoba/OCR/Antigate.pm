@@ -61,6 +61,7 @@ sub send_captcha($)
    else
    {
       warn $res->content;
+      return;
    }
 }
 

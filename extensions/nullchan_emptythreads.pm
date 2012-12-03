@@ -7,7 +7,7 @@ use Piston::Extensions;
 use Boards::Nullchan;
 
 extension(
-   if   => sub { $Piston::config->{chan} eq "nullchan" && $Piston::config->{nullthreads} },
+   if   => sub { $Piston::config->{chan} eq "nullchan" && $Piston::config->{emptythreads} },
    name => "Бамп пустых тредов",
    init => \&refresh,
    main => \&refresh,
