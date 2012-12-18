@@ -37,16 +37,13 @@ sub CONSTRUCT {
    $self->{lwp}->proxy($self->{proxy}) if $self->{proxy};
    $self->{lwp}->cookie_jar({});
    #----------------------------------------
-   my @args = (
+   $self->{captcha} = new Yoba::OCR(
       mode   => $Piston::config->{ocr_mode},
       delete => 1,
+      opt_hands     => $Piston::config->{thischan}->{hands},
+      opt_tesseract => $Piston::config->{thischan}->{tesseract},
+      opt_antigate  => $Piston::config->{thischan}->{antigate},
    );
-   if($Piston::config->{ocr_mode} =~ /tesse?r?a?c?t?/) {
-      push @args, (args => $Piston::config->{thischan}->{tesseract});
-   } elsif($Piston::config->{ocr_mode} =~ /antigate/) {
-      push @args, (args => $Piston::config->{thischan}->{antigate});
-   }
-   $self->{captcha} = new Yoba::OCR(@args);
    #----------------------------------------
    if($Piston::config->{pregen}) {
       $self->set_board;
@@ -180,12 +177,6 @@ sub after_post() {
 sub run_ocr(@) {
    my $self = shift;
    my(@args) = @_;
-
-   #FIXME Работает, пока эти аргументы используются только с ручным вводом
-   if($Piston::config->{thischan}->{captcha}->{chars}) {
-      push @args, $Piston::config->{thischan}->{captcha}->{chars};
-   }
-
    $self->{captcha}->run(@args);
    return $self->{captcha}->is_entered;
 }

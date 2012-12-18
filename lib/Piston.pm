@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.7.2";
+   our $VERSION = "2.7.3";
    our $opt;
 
    require "config/config.pl";
@@ -149,7 +149,7 @@ sub wipe_func_1($) {
          $t->join;
          if($wipe->{captcha}->has_file) {
             $errors{$proxy} = -1;
-            $wipe->run_ocr("");
+            $wipe->run_ocr;
             $wipe->log(3, "КАПЧА", "Капча не введена!") unless $wipe->{captcha}->is_entered;
          } else {
             $errors{$proxy}++ if $errors{$proxy} != -1;
@@ -215,10 +215,10 @@ sub wipe_func_2($) {
 
             if($Piston::config->{ocr_mode} =~ /antigate/) {
                push @antigate_threads, Coro::async {
-                  $wipe->run_ocr("$i/$count");
+                  $wipe->run_ocr(title => "$i/$count");
                };
             } else {
-               $wipe->run_ocr("$i/$count");
+               $wipe->run_ocr(title => "$i/$count");
                $i++;
                $wipe->log(3, "КАПЧА", "Капча не введена!") unless $wipe->{captcha}->is_entered;
             }

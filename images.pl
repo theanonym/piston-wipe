@@ -22,7 +22,8 @@ GetOptions($opt,
    "help" => sub { print_help(); exit }
 );
 
-sub print_help {
+sub print_help
+{
    say <<HLP;
 Yoba image compressor
 

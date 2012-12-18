@@ -1,22 +1,32 @@
+#----------------------------------------
+#
+#  Интерфейс к antigate.com.
+#
+#  my $antigate = new Yoba::OCR::Antigate(( options ));
+#  my $id = $antigate->send_captcha($filename);
+#  my $text = $antigate->receive_text($id);
+#
+#----------------------------------------
+
 package Yoba::OCR::Antigate;
 
 use 5.010;
 use strict;
 use warnings;
+use Carp;
 
 use Params::Check qw/check/;
 
 use Yoba;
-use Yoba::Coro;
 use Yoba::Object;
-
-our $lwp = new Yoba::LWP;
+use Yoba::Coro;
 
 sub CONSTRUCT
 {
    my $self = shift;
 
-   die unless check({
+   Carp::croak "Неверные аргументы конструктору"
+   unless check({
       key        => { required => 1 },
       phrase     => {},
       regsense   => {},
@@ -34,9 +44,17 @@ sub send_captcha($)
 {
    my $self = shift;
    my($fname) = @_;
-   die unless -s $fname;
+   #----------------------------------------
+   unless(-s $fname)
+   {
+      Carp::carp "Нет файла капчи";
+      return;
+   }
+   #----------------------------------------
+   my $lwp = new Yoba::LWP;
+   my $res = $lwp->post(
+      "http://antigate.com/in.php",
 
-   my $res = $lwp->post("http://antigate.com/in.php",
       Content_Type => "form-data",
       Content => [
          method => "post",
@@ -53,25 +71,27 @@ sub send_captcha($)
          file => [$fname],
       ],
    );
-
+   #----------------------------------------
    if($res->content =~ /^OK\|(.*)/)
    {
       return $1;
    }
    else
    {
-      warn $res->content;
+      Capr::carp $res->content;
       return;
    }
+   #----------------------------------------
 }
 
 # -> string
 # <- string
-sub get_ocr($)
+sub receive_text($)
 {
    my $self = shift;
    my($id) = @_;
-
+   #----------------------------------------
+   my $lwp = new Yoba::LWP;
    while(1)
    {
       my $res = $lwp->get("http://antigate.com/res.php?key=$$self{key}&action=get&id=$id");
@@ -82,14 +102,15 @@ sub get_ocr($)
       }
       elsif($res->content =~ /^CAPCHA_NOT_READY/)
       {
-         Coro::AnyEvent::sleep(3);
+         Coro::AnyEvent::sleep 3;
       }
       else
       {
-         warn $res->content;
+         Capr::carp $res->content;
          return;
       }
    }
+   #----------------------------------------
 }
 
 2;

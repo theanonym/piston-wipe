@@ -1,3 +1,9 @@
+#----------------------------------------
+#
+#  Библиотека Yoba.
+#
+#----------------------------------------
+
 package Yoba;
 
 use 5.010;
@@ -25,19 +31,22 @@ use String::ShellQuote qw/shell_quote/;
 use Params::Check;
 use Try::Tiny;
 
+use Yoba::Functional ();
 use Yoba::LWP;
 
 #----------------------------------------
 # Функции для работы с массивами
 #----------------------------------------
 
-# -> [any], string
+# -> [any], any
 # <- int
-sub array_find($$) {
+sub array_find($$)
+{
    my($array, $value) = @_;
    do { Carp::carp "Empty array"; return } unless @$array;
    return -1 unless $value ~~ @$array;
-   for my $i (0 .. $#$array) {
+   for my $i (0 .. $#$array)
+   {
       next unless defined $array->[$i];
       return $i if $array->[$i] eq $value;
    }
@@ -45,10 +54,12 @@ sub array_find($$) {
 
 # -> [any], any
 # <- bool
-sub array_delete($$) {
+sub array_delete($$)
+{
    my($array, $value) = @_;
    my $i = array_find($array, $value);
-   if($i != -1) {
+   if($i != -1)
+   {
       splice @$array, $i, 1;
       return 1;
    } else {
@@ -58,19 +69,24 @@ sub array_delete($$) {
 
 # -> [any], int
 # <- any | (any)
-sub array_pick($;$) {
+sub array_pick($;$)
+{
    my($array, $n) = @_;
    do { Carp::carp "Empty array"; return } unless @$array;
-   unless($n) {
+   unless($n)
+   {
       return $$array[rand @$array];
-   } else {
+   }
+   else
+   {
       array_unique($array);
-      Carp::croak "Too small aray" unless @$array >= $n;
+      Carp::croak "Too small array" unless @$array >= $n;
       return @$array if @$array == $n;
       my @temp = @$array;
       my @ret;
       no warnings;
-      for(1 .. $n) {
+      for(1 .. $n)
+      {
          my $new = array_pick(\@temp);
          array_delete(\@temp, $new);
          push @ret, $new;
@@ -81,7 +97,8 @@ sub array_pick($;$) {
 
 # -> [any]
 *unique = \&array_unique;
-sub array_unique($) {
+sub array_unique($)
+{
    my($array) = @_;
    do { Carp::carp "Empty array"; return } unless @$array;
    my %a;
@@ -95,14 +112,16 @@ sub array_unique($) {
 
 # -> string
 # <- string
-sub prompt {
+sub prompt
+{
    my($msg) = @_;
    print $msg;
-   return readline;
+   return scalar readline;
 }
 
 # -> (any)
-sub print_dump(@) {
+sub print_dump(@)
+{
    require Data::Dump;
    say Data::Dump::dump(@_);
    return;
@@ -110,7 +129,8 @@ sub print_dump(@) {
 
 # -> {}
 # <- (strings)
-sub find_files {
+sub find_files
+{
    my $args = {@_};
    die unless Params::Check::check({
       path => { required => 1 },
@@ -120,9 +140,12 @@ sub find_files {
    }, $args, 1);
    #----------------------------------------
    my @files;
-   unless($args->{recursive}) {
+   unless($args->{recursive})
+   {
       @files = glob Yoba::catfile($args->{path}, "*");
-   } else {
+   }
+   else
+   {
       File::Find::find({no_chdir => 1, wanted => sub {push @files, $_}}, $args->{path});
    }
    #----------------------------------------
@@ -133,10 +156,12 @@ sub find_files {
 }
 
 # -> any
-# <- (any)
-sub unref {
+# <- any | (any)
+sub unref
+{
    my($ref) = @_;
-   given(ref $ref) {
+   given(ref $ref)
+   {
       when("SCALAR") { return $$ref }
       when("ARRAY")  { return @$ref }
       when("HASH")   { return %$ref }
@@ -147,39 +172,60 @@ sub unref {
 }
 
 # -> string, string
-sub notify($$) {
+sub notify($$)
+{
    my($head, $message) = @_;
-   system shell_quote("notify-send $head $message");
+   system qq~notify-send "$head" "$message"~;
    return;
 }
 
+#----------------------------------------
+# Функции для работы со строками
+#----------------------------------------
+
+# Эта функция оставляет в тексте только кириллицу
+# и знаки, расставляет заглавные буквы, точки, удаляет
+# лишние пробелы и пропуски строки.
+#
 # -> string
 # <- string
-sub yobatext {
+sub yobatext
+{
    my($text) = @_;
    use utf8;
+   my $a = 'А-ЯЁа-яё';         # Кириллица
+   my $b = '\.\,\!\?\"\(\)\-'; # Знаки
+   my $c = '\.\,\!\?\"\(\)';   # Знаки без тире
+   my $d = '\.\!\?';           # Завершающие знаки
    $text = decode("utf-8", $text);
-   my $a = 'А-ЯЁа-яё';
-   my $b = '\.\,\!\?\-\"\(\)';
-   $text =~ tr/«»—/""-/;
-   $text =~ s/[^$a$b\s]/ /g;
-   $text =~ s/[^$a][$b]/ /g;
-   $text =~ s/\s+/ /g;
-   $text =~ s/\s+([$b])/$1/g;
-   $text =~ s/([\.\!\?])\s([$a])/$1 \u$2/g;
-   $text =~ s/^\s+([$a])/\u$1/;
-   $text =~ s/([\.\!\?])?\s+$/$1 || '.'/e;
+   for($text)
+   {
+      tr/«»—/""-/;                  # Замена выёбистых кавычек и тире на обычные
+      s/[^$a$b\s]/ /g;              # Замена не-кириллицы, не-знаков и не-пропусков пробелами
+      s/([$a][$c])?[^$a]+?[$c]/($1 || "") . " "/ge; # Удаление знаков, которые следуют не после буквы
+      s/(?:[$b]|\ {2,})\-//g;       # Удаление отдельных тире
+      s/^[\ $b]+|[\ $b]+$//gm;      # Удаление знаков и пробелов в конце и начале строк
+      s/\s+/ /g;                    # Замена скоплений пропусков на один пробел
+      s/([$a][$d] )([$a])/$1\u$2/g; # Расстановка заглавных после завершающих знаков
+      s/^([$a])/\u$1/gm;            # Расстановка заглавных в начале строк
+      s/([$a])\ ([А-ЯЁ])/$1. $2/g;  # Расстановка точек перед заглавными
+      s/[^$a]*$/./s;                # Точка в конце
+   }
    return encode("utf-8", $text);
 }
 
-# -> string
-# <- string
-sub split_text($) {
+# Эта функция пропускает текст через фукнцию yobatext
+# и разбивает его на предложения.
+#
+# -> \string
+# <- (string)
+sub split_text($)
+{
    my($text) = @_;
    return grep {
-      $_ = yobatext($_);
-      length >= 10 and $_ = encode("utf-8", ucfirst $_) . '.';
-   } split /[\.\n\?\!]/, decode("utf-8", $$text);
+      $_ = yobatext $_;
+      length >= 10; # Кириллический символ здесь за 2
+   } split /[\.\n\?\!]/, $$text;
 }
 
 #----------------------------------------
@@ -188,16 +234,22 @@ sub split_text($) {
 
 # -> string
 # <- string
-sub http_get($) {
+sub http_get($)
+{
    my($url) = @_;
    $url = setscheme($url);
+   #----------------------------------------
    my $lwp = new Yoba::LWP;
    $lwp->agent("Opera/9.80 (X11; Linux i686; U; en) Presto/2.10.229 Version/11.61");
-   $lwp->referer(gethost($url));
+   $lwp->referer($url);
+   #----------------------------------------
    my $res = $lwp->get($url);
-   if($res->is_success) {
+   if($res->is_success)
+   {
       return $res->{_content};
-   } else {
+   }
+   else
+   {
       Carp::carp "Ошибка: не удалось скачать '$url'.\n";
       return;
    }
@@ -205,16 +257,21 @@ sub http_get($) {
 
 # -> string, string || [strings]
 # <- HTTP::Response
-sub http_post($$) {
+sub http_post($$)
+{
    my($url, $content) = @_;
    $url = setscheme($url);
+   #----------------------------------------
    my $lwp = new Yoba::LWP;
    $lwp->agent("Opera/9.80 (X11; Linux i686; U; en) Presto/2.10.229 Version/11.61");
-   $lwp->referer(gethost($url));
-   my $res = $lwp->post($url,
+   $lwp->referer($url);
+   #----------------------------------------
+   my $res = $lwp->post(
+      $url,
       Content_Type => ref($content) eq "ARRAY" ? "form-data" : "application/x-www-form-urlencoded",
       Content =>  $content,
    );
+   #----------------------------------------
    return $res;
 }
 
@@ -224,7 +281,8 @@ sub http_post($$) {
 
 # -> string, string
 # <- string
-sub setscheme($;$) {
+sub setscheme($;$)
+{
    my($url, $scheme) = @_;
    $scheme ||= "http";
    return $url =~ m~^\w+://~ ? $url : "$scheme://$url";
@@ -232,7 +290,8 @@ sub setscheme($;$) {
 
 # -> string
 # <- string
-sub gethost($) {
+sub gethost($)
+{
    my($url) = @_;
    my($host) = $url =~ m~^((?:\w+://)?[^/]+)~;
    return $host . '/';
@@ -240,7 +299,8 @@ sub gethost($) {
 
 # -> (string)
 # <- string
-sub caturl(@) {
+sub caturl(@)
+{
    my $url = join "/", @_;
    $url =~ s~^(\w+://)/~$1~;
    $url =~ s~([^:]/)/~$1~g;
@@ -249,7 +309,8 @@ sub caturl(@) {
 
 # -> string
 # <- (string)
-sub read_proxylist($) {
+sub read_proxylist($)
+{
    my($fname) = @_;
    my $file = read_file($fname);
    return parse_proxies($file);
@@ -257,17 +318,21 @@ sub read_proxylist($) {
 
 # -> string
 # <- (string)
-sub parse_proxies($) {
+sub parse_proxies($)
+{
    my($text) = @_;
+   #----------------------------------------
    my @proxies = $text =~ m~((?:\w+://)?[a-z0-9\.]*?\.(?:.{2,3}|\d{1,3}):\d{2,4})~gm;
    Yoba::array_unique(\@proxies);
    my @result;
    my %ips;
-   for my $proxy (@proxies) {
+   for my $proxy (@proxies)
+   {
       my($ip) = $proxy =~ m~(?:\w+://)?(.*?):\d+~;
       next if(length $ip < 8);
       push @result, $proxy unless $ips{$ip}++;
    }
+   #----------------------------------------
    return map { setscheme($_) } @result;
 }
 
