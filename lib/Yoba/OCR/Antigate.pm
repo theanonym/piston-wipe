@@ -78,7 +78,7 @@ sub send_captcha($)
    }
    else
    {
-      Capr::carp $res->content;
+      Carp::carp $res->content;
       return;
    }
    #----------------------------------------
@@ -106,7 +106,7 @@ sub receive_text($)
       }
       else
       {
-         Capr::carp $res->content;
+         Carp::carp $res->content;
          return;
       }
    }

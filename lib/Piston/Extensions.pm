@@ -40,7 +40,7 @@ sub extension {
          code => $args->{$point},
          fname => basename((caller)[1]),
       };
-      say colored("   $ext->{fname}", "green") unless $ext->{fname} ~~ @{ $shared->{loaded} };
+      say colored("   $ext->{fname} ($ext->{name})", "green") unless $ext->{fname} ~~ @{ $shared->{loaded} };
       push @{ $shared->{loaded} }, $ext->{fname};
       push @{ $shared->{$point} }, $ext;
    }
