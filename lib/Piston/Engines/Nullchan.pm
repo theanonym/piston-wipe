@@ -7,8 +7,8 @@ use Carp;
 
 use base "Exporter";
 our @EXPORT = qw/
-   captcha_request
-   post_request
+   make_captcha_request
+   make_post_request
    handle_captcha_response
    handle_post_response
 /;
@@ -21,18 +21,18 @@ use Yoba;
 
 # -> Piston::Wipe
 # <- HTTP::Request
-sub captcha_request($) {
-   my($wipe) = @_;
-   my $url = Yoba::caturl($Piston::config->{thischan}->{url}, "captcha.php");
-   my $request = GET($url);
-   return $request;
+sub make_captcha_request($)
+{
+   return GET(caturl($Piston::config->{thischan}->{url}, "captcha.php"));
 }
 
 # -> Piston::Wipe
 # <- HTTP::Request
-sub post_request($) {
+sub make_post_request($)
+{
    my($wipe) = @_;
    #----------------------------------------
+   # Основные поля
    my $content = [
       board        => $wipe->{board},
       replythread  => $wipe->{thread},
@@ -41,69 +41,66 @@ sub post_request($) {
       subject      => $wipe->{postform}->{subject},
       message      => $wipe->{postform}->{text},
       postpassword => $wipe->{postform}->{password},
+      captcha      => $wipe->{captcha}->{text},
       embed        => $wipe->{postform}->{video},
       embedtype    => "youtube",
    ];
    #----------------------------------------
-   unless($Piston::config->{thischan}->{recaptcha}) {
-      push @$content, (captcha => $wipe->{captcha}->{text});
-   } else {
-      push @$content, (
-         recaptcha_challenge_field => $wipe->{recaptcha_key},
-         recaptcha_response_field  => $wipe->{captcha}->{text},
-      );
-   }
-   #----------------------------------------
-   if($wipe->{postform}->has_image) {
+   # Картинка
+   if($wipe->{postform}->has_image)
+   {
       push @$content, (
          imagefile => [
             undef, basename($wipe->{postform}->{file}),
             Content_Type => "*/*",
-            Content => $wipe->{postform}->{image},
+            Content      => $wipe->{postform}->{image},
          ],
       );
    }
-   if($Piston::config->{chan} eq "nullchan" && $wipe->{board} eq "b") {
-      push @$content, (mm => 0);
-   }
+   # mm
+   push @$content, (mm => 0) if $wipe->{board} eq "b";
    #----------------------------------------
-   my $url = Yoba::caturl($Piston::config->{thischan}->{url}, "board.php");
-   my $request = POST($url,
+   return POST(
+      caturl($Piston::config->{thischan}->{url}, "board.php"),
       Content_Type => "form-data",
-      Content => $content,
+      Content      => $content,
    );
-   return $request;
 }
 
 # -> Piston::Wipe
-# <- int, string
-# 1 - Успешно
-# 2 - Ошибка
-# 3 - Фатальная ошибка для этой прокси
-sub handle_captcha_response($) {
+# <- number, string
+# 0 - Успешно
+# 1 - Ошибка
+# 2 - Фатальная ошибка для этой прокси
+sub handle_captcha_response($)
+{
    my($wipe) = @_;
-   #----------------------------------------
    my $response = $wipe->{captcha_response};
-   my($error, $code);
+   my $cfmt = $Piston::config->{thischan}->{captcha}->{type};
    #----------------------------------------
-   my $fmt = $Piston::config->{thischan}->{captcha}->{type};
-   if(exists $response->{_headers}->{"content-type"}
-      && $response->{_headers}->{"content-type"} =~ /image\/$fmt/) {
-      write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
-      return(1, "");
-   } else {
-      ($error, $code) = ($response->status_line, 2);
+   my($errcode, $errstr);
+
+   # Успешно (код 0)
+   if(exists $response->{_headers}->{"content-type"} && $response->{_headers}->{"content-type"} =~ /image\/$cfmt/)
+   {
+      ($errcode, $errstr) = (0, "");
+      # write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
-   #----------------------------------------
-   if($response->{_rc} ~~ [400, 403] ||
-      ($response->{_rc} == 200 &&
-         (!exists $response->{_headers}->{"content-type"} ||
-         $response->{_headers}->{"content-type"} !~ /image\/$fmt/))) {
-      $code = 3;
+
+   # Фатальная ошибка (код 2)
+   elsif($response->{_rc} ~~ [200, 400, 403])
+   {
+      ($errcode, $errstr) = (2, $response->status_line);
       write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
+
+   # Обычная ошибка (код 1)
+   else
+   {
+      ($errcode, $errstr) = (1, $response->status_line);
+   }
    #----------------------------------------
-   return($code, $error);
+   return ($errcode, $errstr);
 }
 
 my $errors = {
@@ -117,50 +114,64 @@ my $errors = {
 };
 
 # -> Piston::Wipe
-# <- int, string
-# 1 - Пост отправлен успешно
-# 2 - Ошибка движка, пост ещё может быть отправлен
-# 3 - Ошибка движка, пост не может отправлен
-# 4 - Ошибка соединения
-# 5 - Фатальная ошибка для этой прокси
-sub handle_post_response($) {
+# <- number, string
+# 0 - Успешно
+# 1 - Ошибка движка (пост может быть отправлен)
+# 2 - Ошибка движка (пост не может быть отправлен)
+# 3 - Ошибка движка (фатальная)
+# 4 - Ошибка соединения (пост может быть отправлен)
+# 5 - Ошибка соединения (фатальная)
+sub handle_post_response($)
+{
    my($wipe) = @_;
-   #----------------------------------------
    my $response = $wipe->{post_response};
-   my($error, $code);
    #----------------------------------------
-   # Общая обработка
-   if(exists $response->{_headers}->{location}) {
-      # Успешно
-      #($error, $code) = ("", 1);
-      return(1, "");
-   } elsif($response->{_rc} == 200) {
-      given($response->{_content}) {
-         when($errors->{a}) { ($error, $code) = ($1, 2) }
-         when($errors->{b}) { ($error, $code) = ($1, 3) }
-         default            { ($error, $code) = ("Неизвестная ошибка", 2) }
+   my($errcode, $errstr);
+
+   # Успешно (код 0)
+   if(exists $response->{_headers}->{location})
+   {
+      ($errcode, $errstr) = (0, "");
+   }
+
+   # Ошибка движка (код 1 или 2)
+   elsif($response->{_rc} == 200)
+   {
+      given($response->{_content})
+      {
+         when($errors->{a}) { ($errcode, $errstr) = (1, $1); }
+         when($errors->{b}) { ($errcode, $errstr) = (2, $1); }
+         default            { ($errcode, $errstr) = (1, "Неизвестная ошибка"); }
       }
-   } else {
-      ($error, $code) = ($response->status_line, 4);
+   }
+
+   # Ошибка соединения (код 4)
+   else
+   {
+      ($errcode, $errstr) = (4, $response->status_line);
    }
    #----------------------------------------
-   # Исключительные ситуации
-   # Ошибка 503 Forbidden
-   if($response->{_rc} == 403) {
-      $code = 5;
+   # Фатальная ошибка соединения (код 5)
+   if($response->{_rc} == 403)
+   {
+      $errcode = 5;
       write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
-   # Забаненая прокси
-   given($error) {
-      when(["YOU ARE BANNED", "possible proxy"]) {
-         $code = 5;
-         write_file("bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
-      } when(["BuildThread"]) {
-         ($error, $code) = ("", 1);
-      }
+
+   # Фатальная ошибка движка (код 3)
+   if($errstr ~~ ["YOU ARE BANNED", "possible proxy"])
+   {
+      $errcode = 3;
+      write_file("bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+   }
+
+   # Пост отправлен успешно (код 0)
+   if($errstr ~~ ["BuildThread"])
+   {
+      ($errcode, $errstr) = (0, "");
    }
    #----------------------------------------
-   return($code, $error);
+   return ($errcode, $errstr);
 }
 
 2;

@@ -159,7 +159,7 @@ sub wipe_func_1($) {
       if(!$Piston::config->{thischan}->{captcha} || $wipe->{captcha}->is_entered) {
          my $t = send_post($wipe);
          $t->start;
-         $t->join
+         $t->join;
       }
    }
 
@@ -196,7 +196,7 @@ sub wipe_func_2($) {
             params   => \@wipes,
             timelimit => $Piston::config->{captcha_timelimit},
             semaphore => $captcha_semaphore,
-            function => \&get_captcha_func,
+            function => \&captcha_request_func,
          );
 
          $captcha_pool->start_all;
@@ -238,7 +238,7 @@ sub wipe_func_2($) {
          params   => \@wipes,
          timelimit => $Piston::config->{post_timelimit},
          semaphore => $post_semaphore,
-         function => \&send_post_func,
+         function => \&post_request_func,
       );
 
       $posting_pool->start_all;
@@ -262,7 +262,7 @@ sub get_captcha($) {
       timelimit => $Piston::config->{captcha_timelimit},
       semaphore => $captcha_semaphore,
       param     => $wipe,
-      function  => \&get_captcha_func,
+      function  => \&captcha_request_func,
    );
 }
 
@@ -276,45 +276,59 @@ sub send_post($) {
       timelimit => $Piston::config->{post_timelimit},
       semaphore => $post_semaphore,
       param     => $wipe,
-      function  => \&send_post_func,
+      function  => \&post_request_func,
    );
 }
 
 # -> Piston::Wipe
-# <- int
-sub get_captcha_func {
+# <- bool
+sub captcha_request_func
+{
    my($wipe) = @_;
-   my $res;
-   for my $a (1 .. $Piston::config->{captcha_attempts}) {
-      $wipe->before_captcha;
-      $wipe->get_captcha;
-      $res = $wipe->after_captcha;
-      given($res) {
-         when(1)  { last }
-         when(0)  { sleep_this_thread(5) if $a < $Piston::config->{captcha_attempts} }
-         when(-1) { last }
+   my $errcode;
+   for my $att (1 .. $Piston::config->{captcha_attempts})
+   {
+      $wipe->before_captcha_request;
+      $wipe->captcha_request;
+      $errcode = $wipe->after_captcha_request;
+      given($errcode)
+      {
+         # Успешно
+         when(0) { last; }
+         # Ошибка
+         when(1) { Piston::sleep_this_thread(5) if $att < $Piston::config->{captcha_attempts}; }
+         # Фатальная ошибка
+         when(2) { Piston::kill_this_thread(); }
       }
    }
-   return $res;
+   return !!$errcode;
 }
 
 # -> Piston::Wipe
-# <- int
-sub send_post_func {
-   my($wipe) = @_;
+# <- bool
+sub post_request_func
+{
    return unless @threads;
-   my $res;
-   for my $a (1 .. $Piston::config->{post_attempts}) {
-      $wipe->before_post;
-      $wipe->send_post;
-      $res = $wipe->after_post;
-      given($res) {
-         when(1)  { last }
-         when(0)  { sleep_this_thread(5) if $a < $Piston::config->{post_attempts} }
-         when(-1) { last }
+   my($wipe) = @_;
+   my $errcode;
+   for my $att (1 .. $Piston::config->{post_attempts})
+   {
+      $wipe->before_post_request;
+      $wipe->post_request;
+      $errcode = $wipe->after_post_request;
+      given($errcode)
+      {
+         # Успешно
+         when(0) { last; }
+         # Ошибка (пост может быть отправлен)
+         when(1) { Piston::sleep_this_thread(5) if $att < $Piston::config->{post_attempts}; }
+         # Ошибка (пост НЕ может быть отправлен)
+         when(2) { last; }
+         # Фатальная ошибка
+         when(3) { Piston::kill_this_thread(); }
       }
-    }
-   return $res;
+   }
+   return !!$errcode;
 }
 
 #--------------------------------------------------------------------------------
