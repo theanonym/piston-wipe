@@ -9,6 +9,7 @@ use Encode qw/encode decode/;
 use File::Slurp qw/read_file write_file/;
 
 use Yoba::Object;
+use Piston::Postform::Generators;
 
 our $cache = {};
 
@@ -133,6 +134,8 @@ sub CONSTRUCT {
       # Режим текста
       when("copypasta")   { $self->{text} = $copypasta[rand @copypasta] }
       when("posts")       { $self->{text} = $posts[rand @posts] }
+      when("antikukloeb") { $self->{text} = Piston::Postform::Generators::anti_kukloeb() }
+      when("genbred")     { $self->{text} = Piston::Postform::Generators::genbred() }
       default             { $self->{text} = $Piston::config->{postform}->{text} }
    }
    #----------------------------------------
