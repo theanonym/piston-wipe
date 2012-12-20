@@ -9,7 +9,7 @@ use Piston::Extensions;
 use Boards::Nullchan qw/get_catalog_page parse_threads_table/;
 
 extension(
-   if   => sub { $Piston::config->{chan} eq "nullchan" },
+   if   => sub { $Piston::config->{chan} eq "nullchan" && $Piston::config->{board} !~ /^_/ },
    name => "Обновление каталога",
    prio => 10,
    init => \&check_catalog,
@@ -17,13 +17,13 @@ extension(
 );
 
 extension(
-   if   => sub { $Piston::config->{chan} eq "nullchan"},
+   if   => sub { $Piston::config->{chan} eq "nullchan" && $Piston::config->{board} !~ /^_/},
    name => "Счётчик постов",
    main => \&postcount,
 );
 
 extension(
-   if   => sub { $Piston::config->{chan} eq "nullchan"},
+   if   => sub { $Piston::config->{chan} eq "nullchan" && $Piston::config->{board} !~ /^_/},
    name => "Проверка бамплимита",
    init => \&check_bumplimit,
    main => \&check_bumplimit,
