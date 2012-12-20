@@ -101,12 +101,12 @@ sub init
    }
    #----------------------------------------
    # Поиск ютуб-роликов
-   if($Piston::config->{postform}->{images_mode} eq "video")
+   if($Piston::config->{postform}->{images_mode} eq "youtube")
    {
       my $videos = "youtube.txt";
       my $used_videos = "youtube_used.txt";
       my @used = read_file($used_videos) if -s $used_videos;
-      if(@videos = grep { not $_ ~~ @used } read_file($videos))
+      if(@videos = grep { chomp; not $_ ~~ @used } read_file($videos))
       {
          Yoba::array_unique(\@videos);
          printf "%d id видео загружено из '$videos'.\n", scalar @videos;
@@ -147,11 +147,12 @@ sub CONSTRUCT {
          $self->{file} = $files[rand @files];
       }
 
-      when("video")
+      when("youtube")
       {
          if(@videos)
          {
             $self->{video} = pop @videos;
+            write_file("youtube_used.txt", { append => 1 }, "$self->{video}\n");
          }
          else
          {
