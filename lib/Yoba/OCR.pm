@@ -57,7 +57,8 @@ sub run(;@)
    {
       when(/hands/)
       {
-         my $title = $new_options->{title} || "Captcha";
+         my $title = "Captcha";
+         $title = $new_options->{title} if $new_options->{title};
          my $cmd = qq~bin/captcha "$self->{file}" "$title" "$self->{opt_hands}->{whitelist}"~;
          $self->{text} = readpipe $cmd;
       }
@@ -69,7 +70,7 @@ sub run(;@)
 
       when(/antigate/)
       {
-         my $ag = new Yoba::Antigate(%{ $self->{opt_antigate} });
+         my $ag = new Yoba::OCR::Antigate(%{ $self->{opt_antigate} });
          say "Antigate: отправка капчи";
          my $id = $ag->send_captcha($self->{file});
          say "Antigate: ожидание ответа";
@@ -84,16 +85,7 @@ sub run(;@)
 sub delete_file
 {
    my $self = shift;
-   #----------------------------------------
-   if($self->has_file)
-   {
-      unlink $self->{file};
-   }
-   else
-   {
-      Carp::carp "Попытка удалить несуществующий файл";
-   }
-   #----------------------------------------
+   unlink $self->{file};
    return;
 }
 
@@ -101,14 +93,14 @@ sub delete_file
 sub has_file
 {
    my $self = shift;
-   return $self->{file} && (-s $self->{file} != 0);   
+   return $self->{file} && -s $self->{file};   
 }
 
 # <- bool
 sub is_entered
 {
    my $self = shift;
-   return $self->{text} && length $self->{text} != 0;
+   return $self->{text} && length $self->{text};
 }
 
 2;
