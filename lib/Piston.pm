@@ -132,7 +132,8 @@ sub wipe_func_1($) {
       #unless($Piston::config->{pregen}) {
          unless(@threads) {
             say "Нет треда, ожидание.\n";
-            until(@threads) {
+            until(@threads)
+            {
                $wait_threads++;
                Piston::sleep_this_thread(1);
                $wait_threads--;
@@ -185,6 +186,17 @@ sub wipe_func_2($) {
       } @$proxies;
 
       last main unless @wipes;
+
+      unless(@Piston::threads)
+      {
+         say "Нет треда, ожидание.\n";
+         until(@Piston::threads)
+         {
+            $wait_threads = @wipes;
+            Coro::AnyEvent::sleep(1);
+            $wait_threads = 0;
+         }
+      }
 
       if($Piston::config->{thischan}->{captcha}) {
          # Загрузка капч
