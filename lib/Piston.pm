@@ -90,8 +90,6 @@ sub init {
    load_extensions();
 
    Piston::Extensions::init() if $Piston::config->{enable_extensions};
-
-   return 1;
 }
 
 sub run {
@@ -187,19 +185,7 @@ sub wipe_func_2($) {
       } @$proxies;
 
       last main unless @wipes;
-      #----------------------------------------
-      unless(@threads)
-      {
-         say "Нет треда, ожидание.\n";
-         until(@threads)
-         {
-            $wait_threads++;
-            Piston::sleep_this_thread(1);
-            $wait_threads--;
-         }
-      }
-      $wipe->set_thread;
-      #----------------------------------------
+
       if($Piston::config->{thischan}->{captcha}) {
          # Загрузка капч
          my $captcha_pool = new Yoba::Coro::Pool(
