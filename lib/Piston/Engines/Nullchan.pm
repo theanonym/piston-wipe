@@ -84,7 +84,7 @@ sub handle_captcha_response($)
    if(exists $response->{_headers}->{"content-type"} && $response->{_headers}->{"content-type"} =~ /image\/$cfmt/)
    {
       ($errcode, $errstr) = (0, "");
-      # write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+      write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Фатальная ошибка (код 2)
@@ -162,7 +162,7 @@ sub handle_post_response($)
    if($errstr ~~ ["YOU ARE BANNED", "possible proxy"])
    {
       $errcode = 3;
-      write_file("bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+      write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Пост отправлен успешно (код 0)
