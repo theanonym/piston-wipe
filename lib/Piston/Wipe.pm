@@ -60,23 +60,11 @@ sub before_captcha_request
 {
    my $self = shift;
    #----------------------------------------
-   if($Piston::config->{thischan}->{recaptcha})
-   {
-      my $req = Piston::Engines::key_request($self);
-      my $res = $self->{lwp}->request($req);
-      if($res->content =~ /challenge : '(.*?)'/)
-      {
-         $self->{recaptcha_key} = $1;
-         $self->log(0, "КАПЧА", "Получен ключ рекапчи");
-      }
-      else
-      {
-         $self->log(0, "КАПЧА", "Не удалось получить ключ рекапчи");
-      }
-   }
-   #----------------------------------------
    unless($Piston::config->{pregen})
    {
+      # Перемещено из before_post_request
+      $self->set_board;
+      $self->set_thread;
       $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
    }
    #----------------------------------------
@@ -90,8 +78,8 @@ sub before_post_request
    #----------------------------------------
    unless($Piston::config->{pregen})
    {
-      $self->set_board;
-      $self->set_thread;
+      # $self->set_board;
+      # $self->set_thread;
       $self->{postform} = new Piston::Postform(wipe => $self);;
       if($Piston::config->{thischan}->{captcha})
       {
@@ -193,28 +181,28 @@ sub after_post_request
       when(2)
       {
          $self->{post_status} = 2;
-         $self->log(3, "ПОСТИНГ", $errstr); 
+         $self->log(3, "ПОСТИНГ", $errstr);
       }
 
       # Ошибка движка (фатальная)
       when(3)
       {
          $self->{post_status} = 3;
-         $self->log(3, "ПОСТИНГ", $errstr); 
+         $self->log(3, "ПОСТИНГ", $errstr);
       }
 
       # Ошибка соединения (пост может быть отправлен)
       when(4)
       {
          $self->{post_status} = 1;
-         $self->log(4, "ПОСТИНГ", $errstr); 
+         $self->log(4, "ПОСТИНГ", $errstr);
       }
 
       # Ошибка соединения (фатальная)
       when(5)
       {
          $self->{post_status} = 3;
-         $self->log(4, "ПОСТИНГ", $errstr); 
+         $self->log(4, "ПОСТИНГ", $errstr);
       }
    }
    #----------------------------------------

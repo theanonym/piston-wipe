@@ -302,8 +302,8 @@ sub gethost($)
 sub caturl(@)
 {
    my $url = join "/", @_;
-   $url =~ s~^(\w+://)/~$1~;
-   $url =~ s~([^:]/)/~$1~g;
+   $url =~ s~^(\w+://)/+~$1~;
+   $url =~ s~([^:]/)/+~$1~g;
    return $url;
 }
 

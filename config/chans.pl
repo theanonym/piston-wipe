@@ -23,4 +23,24 @@ our $chans = {
       threads_delay => 30 * 60,
       posts_delay   => 20,
    },
+
+   iichan => {
+      url    => "http://iichan.hk/",
+      engine => "iichan",
+      captcha => {
+         type => "gif",
+      }, 
+      hands => {
+         whitelist => join "", 'a' .. 'z',
+      },
+      tesseract => {
+         lang   => "eng",
+         config => "eng_lowcase",
+      },
+      antigate => {
+         key => "",
+      },
+      threads_delay => 30 * 60,
+      posts_delay   => 1,
+   },
 };
