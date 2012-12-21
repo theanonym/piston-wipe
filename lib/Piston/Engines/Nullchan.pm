@@ -84,14 +84,14 @@ sub handle_captcha_response($)
    if(exists $response->{_headers}->{"content-type"} && $response->{_headers}->{"content-type"} =~ /image\/$cfmt/)
    {
       ($errcode, $errstr) = (0, "");
-      write_file("nullchan_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+      write_file("$Piston::config->{chan}_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Фатальная ошибка (код 2)
    elsif($response->{_rc} ~~ [200, 400, 403])
    {
       ($errcode, $errstr) = (2, $response->status_line);
-      write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+      write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Обычная ошибка (код 1)
@@ -155,14 +155,14 @@ sub handle_post_response($)
    if($response->{_rc} == 403)
    {
       $errcode = 5;
-      write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+      write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Фатальная ошибка движка (код 3)
    if($errstr ~~ ["YOU ARE BANNED", "possible proxy"])
    {
       $errcode = 3;
-      write_file("nullchan_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+      write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Пост отправлен успешно (код 0)

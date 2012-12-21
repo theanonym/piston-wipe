@@ -131,7 +131,7 @@ sub wipe_func_1($) {
       #----------------------------------------
       #unless($Piston::config->{pregen}) {
          unless(@threads) {
-            say "Нет треда, ожидание.\n";
+            say "Нет треда, ожидание.";
             until(@threads)
             {
                $wait_threads++;
@@ -189,7 +189,7 @@ sub wipe_func_2($) {
 
       unless(@Piston::threads)
       {
-         say "Нет треда, ожидание.\n";
+         say "Нет треда, ожидание.";
          until(@Piston::threads)
          {
             $wait_threads = @wipes;
@@ -381,9 +381,8 @@ sub load_proxies {
    my @proxy = Yoba::read_proxylist($fname);
    my $all = @proxy;
    #----------------------------------------
-   if($Piston::config->{chan} eq "nullchan") {
-      my @ignore = Yoba::read_proxylist("nullchan_bad_proxy.txt") if -s "nullchan_bad_proxy.txt";
-      #@proxy = grep { !/8080$/ && !/3128$/ } @proxy;
+   if(-s "$Piston::config->{chan}_bad_proxy.txt") {
+      my @ignore = read_proxylist "$Piston::config->{chan}_bad_proxy.txt";
       @proxy = grep { not $_ ~~ @ignore } @proxy;
    }
    #----------------------------------------

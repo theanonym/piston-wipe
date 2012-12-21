@@ -21,7 +21,7 @@ use Yoba;
 
 # -> Piston::Wipe
 # <- HTTP::Request
-sub make_captcha_request
+sub make_captcha_request($)
 {
    my($wipe) = @_;
    # Доска: http://iichan.hk/cgi-bin/captcha1.pl/b/?key=mainpage&dummy=
@@ -30,7 +30,7 @@ sub make_captcha_request
       $Piston::config->{thischan}->{url},
       sprintf(
          "/cgi-bin/%s/$$wipe{board}/?key=%s&dummy=",
-         ($wipe->{board} eq "b" ? "captcha1.pl" : "captcha.pl"),
+         ($wipe->{board} =~ /b|a/o ? "captcha1.pl" : "captcha.pl"),
          ($wipe->{thread} ? "res$$wipe{thread}" : "mainpage"),
       ),
    ));
@@ -92,6 +92,14 @@ sub handle_captcha_response($)
    if(exists $response->{_headers}->{"content-type"} && $response->{_headers}->{"content-type"} =~ /image\/$cfmt/)
    {
       ($errcode, $errstr) = (0, "");
+      write_file("$Piston::config->{chan}_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+   }
+
+   # Фатальная ошибка (код 2)
+   elsif($response->{_rc} ~~ [403])
+   {
+      ($errcode, $errstr) = (2, $response->status_line);
+      write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
    }
 
    # Обычная ошибка (код 1)
@@ -107,9 +115,10 @@ my $errors = {
    a => qr/(хуй)/xo,
    b => qr/(
       Сообщения\ без\ изображений\ запрещены|
-      Строка\ отклонена|Флуд|
+      Строка\ отклонена|Флуд|Доступ\ с\ этого\ прокси\ запрещён|
+      Доступ\ с\ этого\ хоста\ запрещён|
       Код\ подтверждения\ не\ найден\ в\ базе|
-      Введён\ неверный\ код\ подтверждения|
+      Введён\ неверный\ код\ подтверждения
    )/xo,
 };
 
@@ -151,6 +160,14 @@ sub handle_post_response($)
       ($errcode, $errstr) = (4, $response->status_line);
    }
    #----------------------------------------
+   # Фатальная ошибка движка (код 3)
+   if($errstr =~ /^Доступ/)
+   {
+      $errcode = 3;
+      write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+   }
+   #----------------------------------------
+   say $response->content if $errstr eq "Неизвестная ошибка";
    return ($errcode, $errstr);
 }
 
