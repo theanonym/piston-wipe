@@ -1,3 +1,5 @@
+return 2 unless $Piston::config->{extensions}->{enable_all};
+
 package Piston::Extensions;
 
 use 5.010;
@@ -13,8 +15,6 @@ use Term::ANSIColor qw/color colored/;
 
 use Yoba;
 
-return 2 unless $Piston::config->{enable_extensions};
-
 our $shared = {};
 
 our @points = qw/
@@ -28,10 +28,12 @@ our @points = qw/
 #----------------------------------------
 
 # -> {}
-sub extension {
+sub extension
+{
    my $args = {@_};
    return if($args->{if} && !$args->{if}->());
-   for my $point (@points) {
+   for my $point (@points)
+   {
       Carp::croak "Неверный приоритет" if($args->{prio} && not $args->{prio} ~~ [0 .. 10]);
       next unless defined $args->{$point};
       my $ext = {
@@ -53,14 +55,19 @@ sub extension {
 
 no strict "refs";
 
-for my $pos (@points) {
+for my $pos (@points)
+{
    *{__PACKAGE__ . "::" . $pos} = sub {
       return unless $shared->{$pos};
       my(@args) = @_;
-      for my $ext (sort { $a->{prio} < $b->{prio} } @{ $shared->{$pos} }) {
-         try {
+      for my $ext (sort { $a->{prio} < $b->{prio} } @{ $shared->{$pos} })
+      {
+         try
+         {
             $ext->{code}->(@args);
-         } catch {
+         }
+         catch
+         {
             print colored("Расширение '$ext->{name}': $_", "red");
          };
       }

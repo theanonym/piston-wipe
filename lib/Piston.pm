@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.7.3";
+   our $VERSION = "2.7.4";
    our $opt;
 
    require "config/config.pl";
@@ -74,7 +74,7 @@ our $watcher;
 # Выход
 $SIG{INT} = sub {
    say colored("\n--- Завершение ---", "yellow bold");
-   Piston::Extensions::exit() if $Piston::config->{enable_extensions};
+   Piston::Extensions::exit() if $Piston::config->{extensions}->{enable_all};
    exit;
 };
 
@@ -87,9 +87,12 @@ sub init {
    $watcher = new Yoba::Coro::Watcher;
 
    @proxies = (0, load_proxies());
-   load_extensions();
 
-   Piston::Extensions::init() if $Piston::config->{enable_extensions};
+   if($Piston::config->{extensions}->{enable_all})
+   {
+      load_extensions();
+      Piston::Extensions::init()
+   }
 }
 
 sub run {
@@ -117,7 +120,7 @@ sub run {
 
    while(1) {
       Piston::sleep_this_thread(2);
-      Piston::Extensions::main() if $Piston::config->{enable_extensions};
+      Piston::Extensions::main() if $Piston::config->{extensions}->{enable_all};
       #----------------------------------------
    }
 }

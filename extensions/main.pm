@@ -10,12 +10,18 @@ use Piston::Extensions;
 use Yoba;
 
 extension(
-   name => "Информер",
-   prio => 10,
-   main => \&informer,
+  if => sub {
+    $Piston::config->{extensions}->{enable_all}
+    &&
+    $Piston::config->{extensions}->{main}->{informer}->{enable}
+  },
+  name => "Информер",
+  prio => 10,
+  main => \&informer,
 );
 
-sub informer {
+sub informer
+{
    my $wait    = $Piston::wait_threads;
    my $captcha = $Piston::config->{max_connections} - $Piston::captcha_semaphore->count;
    my $post    = $Piston::config->{max_connections} - $Piston::post_semaphore->count;

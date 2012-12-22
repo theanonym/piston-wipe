@@ -20,6 +20,7 @@ use Piston::Engines;
 use Piston::Postform;
 
 our $lwp;
+
 sub init
 {
    $lwp = new Yoba::LWP;
@@ -68,7 +69,7 @@ sub before_captcha_request
       $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
    }
    #----------------------------------------
-   Piston::Extensions::before_captcha_request($self) if $Piston::config->{enable_extensions};
+   Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
    return;
 }
 
@@ -88,7 +89,7 @@ sub before_post_request
       $self->{post_request} = Piston::Engines::make_post_request($self);
    }
    #----------------------------------------
-   Piston::Extensions::before_post_request($self) if $Piston::config->{enable_extensions};
+   Piston::Extensions::before_post_request($self) if $Piston::config->{extensions}->{enable_all};
    return;
 }
 
@@ -147,7 +148,7 @@ sub after_captcha_request
       }
    }
    #----------------------------------------
-   Piston::Extensions::after_captcha_request($self) if $Piston::config->{enable_extensions};
+   Piston::Extensions::after_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
    return $self->{captcha_status};
 }
 
@@ -206,7 +207,7 @@ sub after_post_request
       }
    }
    #----------------------------------------
-   Piston::Extensions::after_post_request($self) if $Piston::config->{enable_extensions};
+   Piston::Extensions::after_post_request($self) if $Piston::config->{extensions}->{enable_all};
    return $self->{post_status};
 }
 

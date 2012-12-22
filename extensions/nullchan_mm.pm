@@ -10,11 +10,20 @@ use Piston::Extensions;
 our $cache;
 
 extension(
-   if   => sub { $Piston::config->{chan} eq "nullchan" && $Piston::config->{board} eq "b" },
+   if => sub {
+      $Piston::config->{extensions}->{enable_all}
+      &&
+      $Piston::config->{chan} eq "nullchan"
+      &&
+      $Piston::config->{board} eq "b"
+      &&
+      $Piston::config->{extensions}->{nullchan}->{mm}->{enable}
+   },
    before_post_request => \&gen_mm,
 );
 
-sub gen_mm {
+sub gen_mm
+{
    my($wipe) = @_;
    #----------------------------------------
    my $mm = 772897149;

@@ -1,50 +1,106 @@
 our $config = {
-   enable_extensions => 1,
-
-   ocr_mode   => "handsgtk",
-
+   # Режим распознавания капчи
+   # ("hands", "tesseract", "antigate")
+   ocr_mode   => "hands",
+   # Режим вайпа (1, 2)
    wipe_mode => 2,
 
-   use_proxy => 1,
-   proxylist => "",
 
-   proxies_max    => 0,
+   # Использовать прокси (1/0)
+   use_proxy      => 1,
+   # Путь к файлу с прокси
+   proxylist      => "proxylist.txt",
+   # Максимальное количество загружаемых прокси
+   proxies_max    => 100,
+   # Сколько прокси пропустить в начале файла
    proxies_ignore => 0,
 
-   chan    => "nullchan",
-   board   => "b",
-   threads => [],
 
+   # Название борды из chans.pl
+   chan    => "nullchan",
+   # Доска
+   board   => "b",
+   # Список тредов (0 для вайпа доски)
+   threads => [0],
+
+
+   # Генерировать посты до загрузки капчи (экспериментально)
    pregen => 0,
 
+   # Настройка постов
    postform => {
+      # Режим текста
+      # ("", "copypasta", "antikukloeb", "genbred", "posts"(экспериментально))
       text_mode   => "",
-      images_mode => "captcha",
+      # Режим картинок
+      # ("folder", "captcha")
+      images_mode => "folder",
 
+      # Отвечать на случайные посты в вайпаемом треде (экспериментально)
       randreply => 0,
 
-      text   =>  "",
+      # Текст постов, если режим текста не указан
+      text =>  "",
 
+      # Настройка папки с картинками, если режим "folder"
       folder => {
-         path => "",
+         path => "images/pixel",
          regex  => qr/(jpg|png|gif)$/i,
          maxlen => 50 * 1024,
          recursive => 0,
       },
 
+      # Конкретные значения
       email    => '',
       name     => '',
       subject  => '',
       password => '',
    },
 
+
+   # Максимальное количество устанавливаемых соединений
+   # Больше 100 может вызвать проблемы у борды
    max_connections => 300,
 
+   # Время, отводимое на загрузку капчи
    captcha_timelimit => 30.00,
+   # Время, отводимое на отправку поста
    post_timelimit    => 20.00,
+   # Количество попыток загрузить капчу
    captcha_attempts  => 3,
-   post_attempts     => 3,
+   # Количество попыток отправить пост
+   post_attempts     => 5,
+   # Лимит ошибок для каждой прокси
    errors_limit      => 20,
 
+   # Подробность сообщений
    loglevel => 4,
+
+
+   # Настройки расширений
+   extensions => {
+      # Включить все (кроме отключённых) (1/0)
+      enable_all => 1,
+
+      # Основные (не относящиеся к конкретным бордам)
+      main => {
+         # Информация о количестве активных соединений и прочее
+         informer => { enable => 1 },
+      },
+
+      # Нульчан
+      nullchan => {
+         # Обновление каталога
+         catalog => { enable => 1 },
+         # Информация о количестве постов в вайпаемых тредах
+         postcounter => { enable => 0 },
+         # Проверка бамплимита
+         check_bumplimit => { enable => 1 },
+         # Генерация mm для /b/
+         mm => { enable => 1 },
+
+         # Бамп пустых тредов (экспериментально)
+         emptythreads => { enable => 0 },
+      },
+   },
 };
