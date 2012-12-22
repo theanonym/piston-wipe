@@ -96,7 +96,7 @@ sub handle_captcha_response($)
    }
 
    # Фатальная ошибка (код 2)
-   elsif($response->{_rc} ~~ [403])
+   elsif($response->{_rc} ~~ [200,403])
    {
       ($errcode, $errstr) = (2, $response->status_line);
       write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
@@ -116,7 +116,7 @@ my $errors = {
    b => qr/(
       Сообщения\ без\ изображений\ запрещены|
       Строка\ отклонена|Флуд|Доступ\ с\ этого\ прокси\ запрещён|
-      Доступ\ с\ этого\ хоста\ запрещён|
+      Доступ\ с\ этого\ хоста\ запрещён|Open\ proxy\ detected|
       Код\ подтверждения\ не\ найден\ в\ базе|
       Введён\ неверный\ код\ подтверждения
    )/xo,
@@ -161,7 +161,7 @@ sub handle_post_response($)
    }
    #----------------------------------------
    # Фатальная ошибка движка (код 3)
-   if($errstr =~ /^Доступ/)
+   if($errstr =~ /Доступ|Open/)
    {
       $errcode = 3;
       write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");

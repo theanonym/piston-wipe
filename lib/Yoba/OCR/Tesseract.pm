@@ -44,7 +44,7 @@ sub tesseract($$)
       return;
    }
    #----------------------------------------
-   my $tmpfile = $filename . ".tmp.tif";;
+   my $tmpfile = $filename . ".tmp.tif";
    unless($filename =~ /\.tiff?$/)
    {
       return unless _convert($filename, $tmpfile);

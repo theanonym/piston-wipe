@@ -6,7 +6,7 @@
 # package Point;
 #
 # use Yoba::Object;
-# 
+#
 # has "x";
 # hax "y";
 #
@@ -46,7 +46,8 @@ sub _constructor
    return $self;
 }
 
-sub _destructor {
+sub _destructor
+{
    my $self = shift;
    my $package = ref $self;
    if(defined *{ $package . "::DESTRUCT" })
