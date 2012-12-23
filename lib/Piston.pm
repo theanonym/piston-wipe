@@ -256,6 +256,18 @@ sub wipe_func_2($) {
 
       $posting_pool->start_all;
       $posting_pool->join_all;
+
+      my $wait = $Piston::threads[0] == 0 ?
+         $Piston::config->{thischan}->{threads_delay}
+         :
+         $Piston::config->{thischan}->{posts_delay};
+      if($wait)
+      {
+         $Piston::wait_threads = @wipes;
+         say colored("Ожидание $wait с", "cyan");
+         Piston::sleep_this_thread($wait);
+         $Piston::wait_threads = 0;
+      }
    }
 }
 
