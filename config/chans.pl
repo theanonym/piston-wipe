@@ -40,7 +40,7 @@ our $chans = {
       antigate => {
          key => "",
       },
-      threads_delay => 30 * 60,
+      threads_delay => 60,
       posts_delay   => 1,
    },
 
@@ -49,5 +49,13 @@ our $chans = {
       engine => "uchan",
       threads_delay => 60,
       posts_delay   => 15,
+   },
+
+   alterchan => {
+      url    => "http://alterchan.net/",
+      engine => "alterchan",
+      threads_delay => 0,
+      posts_delay   => 0,
+      passwords => ["qwerty"],
    },
 };
