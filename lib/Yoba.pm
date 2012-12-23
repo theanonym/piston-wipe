@@ -283,6 +283,7 @@ sub http_post($$)
 # <- string
 sub setscheme($;$)
 {
+   Carp::croak unless @_;
    my($url, $scheme) = @_;
    $scheme ||= "http";
    return $url =~ m~^\w+://~ ? $url : "$scheme://$url";
@@ -292,6 +293,7 @@ sub setscheme($;$)
 # <- string
 sub gethost($)
 {
+   Carp::croak unless @_;
    my($url) = @_;
    my($host) = $url =~ m~^((?:\w+://)?[^/]+)~;
    return $host . '/';
@@ -301,6 +303,7 @@ sub gethost($)
 # <- string
 sub caturl(@)
 {
+   Carp::croak unless @_;
    my $url = join "/", @_;
    $url =~ s~^(\w+://)/+~$1~;
    $url =~ s~([^:]/)/+~$1~g;

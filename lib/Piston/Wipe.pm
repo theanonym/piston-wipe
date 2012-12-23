@@ -79,8 +79,10 @@ sub before_post_request
    #----------------------------------------
    unless($Piston::config->{pregen})
    {
-      # $self->set_board;
-      # $self->set_thread;
+      # Дополнено
+      $self->set_board  unless defined $self->{board};
+      $self->set_thread unless defined $self->{thread};
+
       $self->{postform} = new Piston::Postform(wipe => $self);;
       if($Piston::config->{thischan}->{captcha})
       {
@@ -108,7 +110,9 @@ sub post_request
 {
    my $self = shift;
    #----------------------------------------
-   $self->log(1, "ПОСТИНГ", "Отправка поста /$$self{board}/$$self{thread}, c:$$self{captcha}{text}");
+   my $msg = "Отправка поста /$$self{board}/$$self{thread}";
+   $msg .= ", c:$$self{captcha}{text}" if $self->{captcha}->{text};
+   $self->log(1, "ПОСТИНГ", $msg);
    $self->{post_response} = $self->{lwp}->request($self->{post_request});
    return;
 }
@@ -168,7 +172,9 @@ sub after_post_request
       when(0)
       {
          $self->{post_status} = 0;
-         $self->log(2, "ПОСТИНГ", "Пост отправлен успешно /$$self{board}/$$self{thread}, c:$$self{captcha}{text}");
+         my $msg = "Пост создан успешно /$$self{board}/$$self{thread}";
+         $msg .= ", c:$$self{captcha}{text}" if $self->{captcha}->{text};
+         $self->log(2, "ПОСТИНГ", $msg);
       }
 
       # Ошибка движка (пост может быть отправлен)

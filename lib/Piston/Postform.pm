@@ -7,6 +7,7 @@ use Carp;
 
 use Encode qw/encode decode/;
 use File::Slurp qw/read_file write_file/;
+use Term::ANSIColor qw/color colored/;
 
 use Yoba::Object;
 use Piston::Postform::Generators;
@@ -42,7 +43,7 @@ sub init
       require Boards::Nullchan;
       if(@links = Boards::Nullchan::parse_post_refs($cache->{thread_page}))
       {
-         printf "%d ссылок на посты найдено в треде $Piston::config->{threads}->[0].\n", scalar @links;
+         printf colored("%d ссылок на посты найдено в треде $Piston::config->{threads}->[0].\n", "cyan"), scalar @links;
       }
       else
       {
@@ -58,7 +59,7 @@ sub init
       if(@posts = Boards::Nullchan::parse_posts($cache->{thread_page}))
       {
          Yoba::array_unique(\@posts);
-         printf "%d постов найдено в треде $Piston::config->{threads}->[0].\n", scalar @posts;
+         printf colored("%d постов найдено в треде $Piston::config->{threads}->[0].\n", "cyan"), scalar @posts;
       }
       else
       {
@@ -77,7 +78,7 @@ sub init
       } split(/\n\-+\n/, $text);
       if(@copypasta)
       {
-         printf "%d блоков копипасты загружено из '$fname'.\n", scalar @copypasta;
+         printf colored("%d блоков копипасты загружено из '$fname'.\n", "cyan"), scalar @copypasta;
       }
       else
       {
@@ -92,7 +93,7 @@ sub init
       Carp::croak "Неверный путь к папке с картинками '$path'.\n" unless -d $path;
       if(@files = Yoba::find_files(%{ $Piston::config->{postform}->{folder} }))
       {
-         printf "%d изображений загружено из '$path'.\n", scalar @files;
+         printf colored("%d изображений загружено из '$path'.\n", "cyan"), scalar @files;
       }
       else
       {
@@ -109,7 +110,7 @@ sub init
       if(@videos = grep { chomp; not $_ ~~ @used } read_file($videos))
       {
          Yoba::array_unique(\@videos);
-         printf "%d id видео загружено из '$videos'.\n", scalar @videos;
+         printf colored("%d id видео загружено из '$videos'.\n", "cyan"), scalar @videos;
       }
       else
       {

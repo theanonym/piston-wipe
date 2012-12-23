@@ -8,6 +8,8 @@ use Carp;
 use LWP;
 use base "LWP::UserAgent";
 
+use Yoba;
+
 push @LWP::Protocol::http::EXTRA_SOCK_OPTS, (SendTE => 0);
 
 sub referer($) {
