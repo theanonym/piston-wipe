@@ -29,7 +29,7 @@ our $chans = {
       engine => "iichan",
       captcha => {
          type => "gif",
-      }, 
+      },
       hands => {
          whitelist => join "", 'a' .. 'z',
       },
@@ -42,5 +42,12 @@ our $chans = {
       },
       threads_delay => 30 * 60,
       posts_delay   => 1,
+   },
+
+   uchan => {
+      url    => "http://uchan.to/",
+      engine => "uchan",
+      threads_delay => 60,
+      posts_delay   => 15,
    },
 };
