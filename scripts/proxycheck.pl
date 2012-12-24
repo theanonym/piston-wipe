@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 
-use lib "lib";
+use lib "lib", "../lib";
 
 use File::Slurp qw/write_file/;
 use List::Util qw/shuffle/;

@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 
-use lib "lib";
+use lib "lib", "../lib";
 
 use File::Path qw/rmtree mkpath/;
 use File::Spec::Functions qw/catfile catdir tmpdir/;

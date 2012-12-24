@@ -9,7 +9,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use lib "lib";
+use lib "lib", "../lib";
 
 use File::Slurp qw/read_file write_file/;
 use File::Path qw/rmtree mkpath/;

@@ -11,7 +11,7 @@
 use 5.010;
 use strict;
 use warnings;
-use lib "lib";
+use lib "lib", "../lib";
 
 use LWP;
 use Coro;
