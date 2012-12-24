@@ -58,4 +58,21 @@ our $chans = {
       posts_delay   => 0,
       passwords => ["qwerty"],
    },
+
+   onechan_boards => {
+      url    => "http://1chan.ru/",
+      engine => "onechanboards",
+      captcha => {
+         type => "jpeg",
+      },
+      hands => {
+         whitelist => join "", 'a' .. 'z', 0 .. 9,
+      },
+      antigate => {
+         key => "",
+      },
+      threads_delay => 0,
+      posts_delay   => 0,
+      homeboards => ["anonymous"],
+   }
 };

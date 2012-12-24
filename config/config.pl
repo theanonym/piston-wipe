@@ -108,5 +108,11 @@ our $config = {
          # Логин перед вайпом
          login => { enable => 1 },
       },
+
+      # Доски одинчана
+      onechan_boards => {
+         # Получение печеньки PHPSESSID
+         sessid => { enable => 1 },
+      }
    },
 };

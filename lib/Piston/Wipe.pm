@@ -49,6 +49,7 @@ sub CONSTRUCT
       $self->set_board;
       $self->set_thread;
       $self->{postform} = new Piston::Postform(wipe => $self);
+      Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
       if($Piston::config->{thischan}->{captcha})
       {
          $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
@@ -66,10 +67,10 @@ sub before_captcha_request
       # Перемещено из before_post_request
       $self->set_board;
       $self->set_thread;
+      Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
       $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
    }
    #----------------------------------------
-   Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
    return;
 }
 
