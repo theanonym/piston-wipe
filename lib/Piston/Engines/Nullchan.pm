@@ -15,6 +15,7 @@ our @EXPORT = qw/
 
 use File::Slurp qw/read_file write_file/;
 use File::Basename qw/dirname basename/;
+use File::MimeInfo qw/mimetype/;
 use HTTP::Request::Common qw/GET POST/;
 
 use Yoba;
@@ -52,7 +53,7 @@ sub make_post_request($)
       push @$content, (
          imagefile => [
             undef, basename($wipe->{postform}->{file}),
-            Content_Type => "*/*",
+            Content_Type => mimetype($wipe->{postform}->{file}),
             Content      => $wipe->{postform}->{image},
          ],
       );

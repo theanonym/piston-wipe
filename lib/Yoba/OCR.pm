@@ -59,7 +59,9 @@ sub run(;@)
       {
          my $title = "Captcha";
          $title = $new_options->{title} if $new_options->{title};
-         my $cmd = qq~bin/captcha "$self->{file}" "$title" "$self->{opt_hands}->{whitelist}"~;
+         $self->{opt_hands}->{whitelist} ||= "";
+         my $cmd = qq~bin/captcha "$self->{file}" "$title" ~;
+         $cmd .= qq~"$self->{opt_hands}->{whitelist}" ~ if $self->{opt_hands}->{whitelist};
          $self->{text} = readpipe $cmd;
       }
 
