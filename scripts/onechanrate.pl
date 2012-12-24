@@ -89,21 +89,15 @@ for my $proxy (@proxies) {
    my $lwp = $lwp->clone;
    $lwp->proxy($proxy) if $proxy;
    $lwp->cookie_jar({});
-
    my $cap = {
       proxy => $proxy,
       lwp => $lwp,
-   };
-
-   if($opt->{ocr_mode} eq "antigate") {
-      $cap->{captcha} = new Yoba::OCR(
+      captcha => new Yoba::OCR(
          mode => $opt->{ocr_mode},
          delete => 1,
-         args => { key => $opt->{antigate} },
-      );
-   } else {
-      $cap->{captcha} = new Yoba::OCR(mode => $opt->{ocr_mode}, delete => 1),
-   }
+         opt_antigate  => { key => $opt->{antigate} },
+      ),
+   };
    push @captcha, $cap;
 }
 

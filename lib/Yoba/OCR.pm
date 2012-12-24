@@ -73,6 +73,12 @@ sub run(;@)
          my $ag = new Yoba::OCR::Antigate(%{ $self->{opt_antigate} });
          say "Antigate: отправка капчи";
          my $id = $ag->send_captcha($self->{file});
+         unless($id)
+         {
+            $self->{text} = "";
+            say "Antigate: не удалось получить id";
+            return;
+         }
          say "Antigate: ожидание ответа";
          $self->{text} = $ag->receive_text($id);
          say "Antigate: ответ получен";
@@ -93,7 +99,7 @@ sub delete_file
 sub has_file
 {
    my $self = shift;
-   return $self->{file} && -s $self->{file};   
+   return $self->{file} && -s $self->{file};
 }
 
 # <- bool
