@@ -6,14 +6,8 @@ Perl-модули:
       Coro Coro::LWP AnyEvent List::MoreUtils File::Slurp
       String::ShellQuote Try::Tiny File::MimeInfo
    Или пакеты:
-      libcoro-perl libanyevent-perl liblwp-protocol-socks-perl liblist-moreutils-perl
+      libcoro-perl libanyevent-perl liblist-moreutils-perl
       libfile-slurp-perl libstring-shellquote-perl libtry-tiny-perl libfile-mimeinfo-perl
-
-Если используются socks-прокси:
-   Установка через cpan:
-      cpan  LWP::Protocol::socks
-   Или пакеты:
-      libssl-dev libnet-ssleay-perl libio-socket-ssl-perl liblwp-protocol-socks-perl
 
 Если используется Tesseract:
    Пакеты:

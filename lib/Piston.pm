@@ -11,7 +11,7 @@ use File::Spec::Functions qw/tmpdir catfile catdir/;
 
 use Term::ANSIColor qw/color colored/;
 
-eval "use LWP::Protocol::socks"; warn $@ if $@;
+#eval "use LWP::Protocol::socks"; warn $@ if $@;
 
 use Yoba;
 use Yoba::LWP;

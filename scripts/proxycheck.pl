@@ -16,7 +16,7 @@ use File::Slurp qw/write_file/;
 use List::Util qw/shuffle/;
 use Getopt::Long qw/GetOptions/;
 
-eval "use LWP::Protocol::socks"; warn $@ if $@;
+#eval "use LWP::Protocol::socks"; warn $@ if $@;
 
 use Yoba;
 use Yoba::LWP;
