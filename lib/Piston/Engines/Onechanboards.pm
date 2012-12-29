@@ -28,7 +28,10 @@ sub make_captcha_request($)
    my($sessid) = $wipe->{lwp}->cookie_jar->as_string =~ /PHPSESSID=(.*?);/;
    die "Не удалось получить PHPSESSID" unless $sessid;
    # http://1chan.ru/captcha/?key=board_comment&PHPSESSID=$sessid
-   return GET("http://1chan.ru/captcha/?key=board_comment&PHPSESSID=$sessid")
+   return GET(caturl(
+      $Piston::config->{thischan}->{url},
+      "captcha/?key=board_comment&PHPSESSID=$sessid",
+   ));
 }
 
 # -> Piston::Wipe
@@ -59,7 +62,11 @@ sub make_post_request($)
    #----------------------------------------
    # http://1chan.ru/b/createPostAjaxForm/
    return POST(
-      caturl($Piston::config->{thischan}->{url}, $wipe->{board}, "createPostAjaxForm/"),
+      caturl(
+         $Piston::config->{thischan}->{url},
+         $wipe->{board},
+         "createPostAjaxForm/",
+      ),
       Content_Type => "form-data",
       Content      => $content,
    );

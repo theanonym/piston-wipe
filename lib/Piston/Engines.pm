@@ -8,12 +8,14 @@ use Carp;
 use base "Exporter";
 our @EXPORT = qw//;
 
-sub init {
+sub init
+{
    eval sprintf("use Piston::Engines\::%s", ucfirst $Piston::config->{thischan}->{engine});
    die "Ошибка или неизвестный движок: $@" if $@;
-   #if($Piston::config->{thischan}->{recaptcha}) {
-   #   eval "use Piston\::Piston::Engines::Recaptcha; 1" or die $@;
-   #}
+   if($Piston::config->{thischan}->{captcha}->{recaptcha})
+   {
+      eval "use Piston\::Engines::Recaptcha; 1" or die $@;
+   }
 }
 
 2;

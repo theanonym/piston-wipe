@@ -49,9 +49,9 @@ sub CONSTRUCT
       $self->set_board;
       $self->set_thread;
       $self->{postform} = new Piston::Postform(wipe => $self);
-      Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
-      if($Piston::config->{thischan}->{captcha})
+      if($Piston::config->{thischan}->{captcha} && !$Piston::config->{thischan}->{captcha}->{recaptcha})
       {
+         Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
          $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
       }
       $self->{post_request} = Piston::Engines::make_post_request($self);
@@ -67,8 +67,11 @@ sub before_captcha_request
       # Перемещено из before_post_request
       $self->set_board;
       $self->set_thread;
-      Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
-      $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
+      unless($Piston::config->{thischan}->{captcha}->{recaptcha})
+      {
+         Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
+         $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
+      }
    }
    #----------------------------------------
    return;
@@ -85,7 +88,7 @@ sub before_post_request
       $self->set_thread unless defined $self->{thread};
 
       $self->{postform} = new Piston::Postform(wipe => $self);;
-      if($Piston::config->{thischan}->{captcha})
+      if($Piston::config->{thischan}->{captcha} && !$Piston::config->{thischan}->{captcha}->{recaptcha})
       {
          $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
       }
@@ -99,9 +102,20 @@ sub before_post_request
 sub captcha_request
 {
    my $self = shift;
-   #----------------------------------------
    # $self->log(1, "КАПЧА", "Запрос капчи");
-   #TODO if $self->{captcha_request}
+   #----------------------------------------
+   #TODO Перенести в before_captcha_request
+   if($Piston::config->{thischan}->{captcha}->{recaptcha})
+   {
+      Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
+      $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
+   }
+   #----------------------------------------
+   #TODO Заглушка
+   unless($self->{captcha_request})
+   {
+      Piston::kill_this_thread();
+   }
    $self->{captcha_response} = $self->{lwp}->request($self->{captcha_request});
    #----------------------------------------
    return;
@@ -115,6 +129,7 @@ sub post_request
    $msg .= ", c:$$self{captcha}{text}" if $self->{captcha}->{text};
    $self->log(1, "ПОСТИНГ", $msg);
    $self->{post_response} = $self->{lwp}->request($self->{post_request});
+   #----------------------------------------
    return;
 }
 

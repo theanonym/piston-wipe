@@ -44,19 +44,19 @@ our $chans = {
       posts_delay   => 1,
    },
 
-   uchan => {
-      url    => "http://uchan.to/",
-      engine => "uchan",
-      threads_delay => 60,
-      posts_delay   => 15,
-   },
-
    alterchan => {
       url    => "http://alterchan.net/",
       engine => "alterchan",
       threads_delay => 0,
       posts_delay   => 0,
       passwords => ["qwerty"],
+   },
+
+   uchan => {
+      url    => "http://uchan.to/",
+      engine => "uchan",
+      threads_delay => 60,
+      posts_delay   => 15,
    },
 
    onechan_boards => {
@@ -74,5 +74,30 @@ our $chans = {
       threads_delay => 0,
       posts_delay   => 0,
       homeboards => ["anonymous"],
-   }
+   },
+
+   rfchan => {
+      url => "http://rfchan.ru/",
+      engine => "rfchan",
+      captcha => {
+         type      => "jpeg",
+         recaptcha => "6LdVg8YSAAAAAOhqx0eFT1Pi49fOavnYgy7e-lTO",
+      },
+      threads_delay => 0,
+      posts_delay   => 0,
+   },
+
+   sosach => {
+      url => "http://2ch.hk/",
+      engine => "sosach",
+      captcha => {
+         type      => "jpeg",
+         recaptcha => "6LdOEMMSAAAAAIGhmYodlkflEb2C-xgPjyATLnxx",
+      },
+      antigate  => {
+         key => "",
+      },
+      threads_delay => 0,
+      posts_delay   => 5,
+   },
 };
