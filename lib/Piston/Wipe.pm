@@ -86,12 +86,7 @@ sub before_post_request
       # Дополнено
       $self->set_board  unless defined $self->{board};
       $self->set_thread unless defined $self->{thread};
-
-      $self->{postform} = new Piston::Postform(wipe => $self);;
-      if($Piston::config->{thischan}->{captcha} && !$Piston::config->{thischan}->{captcha}->{recaptcha})
-      {
-         $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
-      }
+      $self->{postform} = new Piston::Postform(wipe => $self);
       $self->{post_request} = Piston::Engines::make_post_request($self);
    }
    #----------------------------------------
