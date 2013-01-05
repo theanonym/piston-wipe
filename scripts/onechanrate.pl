@@ -146,7 +146,7 @@ if($opt->{ocr_mode} eq "antigate") {
    my $all = @captcha;
    my $count = 1;
    for(@captcha) {
-      $_->{captcha}->run("$count/$all");
+      $_->{captcha}->run(title => "$count/$all");
       $count++;
    }
 }
