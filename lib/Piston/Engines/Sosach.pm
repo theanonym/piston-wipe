@@ -43,6 +43,7 @@ sub make_post_request($)
       sage    => ($wipe->{postform}->{email} eq "sage" ? "on" : ""),
       kasumi  => $wipe->{postform}->{subject},
       shampoo => $wipe->{postform}->{text},
+      video   => ($wipe->{postform}->{video} ? "http://www.youtube.com/watch?v=$wipe->{postform}->{video}" : ""),
       recaptcha_challenge_field => $wipe->{recaptcha_key},
       recaptcha_response_field  => $wipe->{captcha}->{text},
    ];
@@ -75,7 +76,7 @@ sub handle_captcha_response($)
 }
 
 my $errors = {
-   a => qr/(ПУСТО)/xo,
+   a => qr/(видео\ имеет\ неверный\ формат)/xo,
    b => qr/(
       Неверный\ код\ подтверждения|Обнаружен\ флуд
    )/xo,
