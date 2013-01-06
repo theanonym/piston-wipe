@@ -108,6 +108,12 @@ sub handle_post_response($)
       ($errcode, $errstr) = (4, $response->status_line);
    }
    #----------------------------------------
+   if($response->{_rc} == 403)
+   {
+      $errcode = 5;
+      write_file("$Piston::config->{chan}_bad_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+   }
+   #----------------------------------------
    say $response->content if $errstr eq "Неизвестная ошибка";
    return ($errcode, $errstr);
 }
