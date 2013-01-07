@@ -23,14 +23,15 @@ our @posts;  # Список постов из треда
 
 sub init
 {
+   eval "use Boards \"$Piston::config->{chan}\"; 1"
+      or say colored("Поддержка этой борды ограничена.", "cyan");
    #----------------------------------------
    # Получение страницы первого треда из конфига
    sub get_thread_page
    {
       return if $cache->{thread_page};
-      require Boards::Nullchan;
       Carp::croak "Нет треда чтобы скачать." unless $Piston::config->{threads}->[0];
-      $cache->{thread_page} = Boards::Nullchan::get_thread_page(
+      $cache->{thread_page} = Boards::get_thread_page(
          $Piston::config->{board},
          $Piston::config->{threads}->[0],
       );
@@ -40,8 +41,7 @@ sub init
    if($Piston::config->{postform}->{randreply})
    {
       get_thread_page;
-      require Boards::Nullchan;
-      if(@links = Boards::Nullchan::parse_post_refs($cache->{thread_page}))
+      if(@links = Boards::parse_post_refs($cache->{thread_page}))
       {
          printf colored("%d ссылок на посты найдено в треде $Piston::config->{threads}->[0].\n", "cyan"), scalar @links;
       }
@@ -55,8 +55,7 @@ sub init
    if($Piston::config->{postform}->{text_mode} eq "posts")
    {
       get_thread_page;
-      require Boards::Nullchan;
-      if(@posts = Boards::Nullchan::parse_posts($cache->{thread_page}))
+      if(@posts = Boards::parse_posts($cache->{thread_page}))
       {
          Yoba::array_unique(\@posts);
          printf colored("%d постов найдено в треде $Piston::config->{threads}->[0].\n", "cyan"), scalar @posts;

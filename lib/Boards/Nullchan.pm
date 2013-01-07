@@ -14,22 +14,9 @@ our @EXPORT = qw/
    delete_post get_all_threads get_board_page
    get_catalog_page get_last_post get_thread_page
    parse_image_links parse_post_refs parse_posts
-   parse_threads parse_threads_list parse_threads_table
-   str_to_time
+   parse_threads_list parse_threads_table
 /;
 our @EXPORT_OK = @EXPORT;
-
-use Time::Local qw/timelocal/;
-
-our $boards = {
-   main => [qw/b vg/],
-   all  => [qw/a au cook fa fl m med ne ph tv wp war h fur i nhk/],
-   geek => [qw/t e hw s c 8 bg wh bo co f/]
-};
-
-#----------------------------------------
-# Основные функции
-#----------------------------------------
 
 # -> string, int
 # <- string
@@ -92,10 +79,6 @@ sub parse_image_links($) {
    Yoba::array_unique(\@res);
    return @res;
 }
-
-#----------------------------------------
-# Прочие функции
-#----------------------------------------
 
 # -> string
 # <- int
