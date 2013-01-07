@@ -16,6 +16,7 @@ sub referer($) {
    my $self = shift;
    my($url) = @_;
    $self->default_header(referer => Yoba::gethost($url));
+   # $self->default_header(referer => $url);
    return;
 }
 

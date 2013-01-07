@@ -7,7 +7,7 @@ our $config = {
 
 
    # Использовать прокси (1/0)
-   use_proxy      => 1,
+   use_proxy      => 0,
    # Путь к файлу с прокси
    proxylist      => "proxylist.txt",
    # Максимальное количество загружаемых прокси
@@ -33,7 +33,7 @@ our $config = {
       # ("", "copypasta", "antikukloeb", "genbred", "posts"(экспериментально))
       text_mode   => "",
       # Режим картинок
-      # ("folder", "captcha")
+      # ("folder", "captcha", "youtube")
       images_mode => "folder",
 
       # Отвечать на случайные посты в вайпаемом треде (экспериментально)
@@ -109,8 +109,8 @@ our $config = {
          login => { enable => 1 },
       },
 
-      # Доски одинчана
-      onechan_boards => {
+      # Одинчан
+      onechan => {
          # Получение печеньки PHPSESSID
          sessid => { enable => 1 },
       }

@@ -38,6 +38,7 @@ GetOptions($opt,
    "url=s", "threads=s",
    "time=s", "attempts=s",
    "skip=s", "wait=s",
+   "referer=s",
    "help" => sub { print_help(); exit }
 );
 
@@ -95,6 +96,7 @@ write_file($opt->{outfile}, { append => 1 }, join("\n", @result) . "\n");
 sub check_func {
    my($proxy) = @_;
    my $lwp = new Yoba::LWP;
+   $lwp->referer($opt->{referer}) if $opt->{referer};
    $lwp->agent("Opera/9.80 (X11; Linux i686; U; en) Presto/2.10.289 Version/12.00");
    $lwp->proxy($proxy);
    for(1 .. $opt->{attempts}) {

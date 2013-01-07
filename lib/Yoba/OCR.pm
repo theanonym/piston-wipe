@@ -45,7 +45,7 @@ sub DESTRUCT
 sub run(;@)
 {
    my $self = shift;
-   my $new_options = { @_ };
+   my $new_options = { @_ } if @_;
    #----------------------------------------
    unless($self->has_file)
    {

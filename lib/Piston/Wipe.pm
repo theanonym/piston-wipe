@@ -44,12 +44,13 @@ sub CONSTRUCT
       opt_antigate  => $Piston::config->{thischan}->{antigate},
    );
    #----------------------------------------
+   $self->{need_captcha} = $Piston::config->{thischan}->{captcha};
    if($Piston::config->{pregen})
    {
       $self->set_board;
       $self->set_thread;
       $self->{postform} = new Piston::Postform(wipe => $self);
-      if($Piston::config->{thischan}->{captcha} && !$Piston::config->{thischan}->{captcha}->{recaptcha})
+      if($self->{need_captcha} && !$Piston::config->{thischan}->{captcha}->{recaptcha})
       {
          Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
          $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
@@ -105,6 +106,7 @@ sub captcha_request
       Piston::Extensions::before_captcha_request($self) if $Piston::config->{extensions}->{enable_all};
       $self->{captcha_request} = Piston::Engines::make_captcha_request($self);
    }
+   return unless $self->{need_captcha};
    #----------------------------------------
    #TODO Заглушка
    unless($self->{captcha_request})
@@ -135,10 +137,25 @@ sub post_request
 sub after_captcha_request
 {
    my $self = shift;
-   my($errcode, $errstr) = (Piston::Engines::handle_captcha_response($self));
+   #----------------------------------------
+   my($errcode, $errstr);
+   if($self->{need_captcha})
+   {
+      ($errcode, $errstr) = (Piston::Engines::handle_captcha_response($self));
+   }
+   else
+   {
+      ($errcode, $errstr) = -1;
+   }
    #----------------------------------------
    given($errcode)
    {
+      when(-1)
+      {
+         $self->{captcha_status} = 0;
+         $self->log(2, "КАПЧА", "Капча не нужна");
+      }
+
       when(0)
       {
          $self->{captcha_status} = 0;

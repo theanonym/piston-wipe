@@ -24,6 +24,20 @@ our $chans = {
       posts_delay   => 20,
    },
 
+   sosach => {
+      url => "http://2ch.hk/",
+      engine => "sosach",
+      captcha => {
+         type      => "jpeg",
+         recaptcha => "6LdOEMMSAAAAAIGhmYodlkflEb2C-xgPjyATLnxx",
+      },
+      antigate  => {
+         key => "",
+      },
+      threads_delay => 0,
+      posts_delay   => 7,
+   },
+
    iichan => {
       url    => "http://iichan.hk/",
       engine => "iichan",
@@ -65,9 +79,6 @@ our $chans = {
       captcha => {
          type => "jpeg",
       },
-      hands => {
-         whitelist => join "", 'a' .. 'z', 0 .. 9,
-      },
       antigate => {
          key => "",
       },
@@ -85,19 +96,5 @@ our $chans = {
       },
       threads_delay => 0,
       posts_delay   => 0,
-   },
-
-   sosach => {
-      url => "http://2ch.hk/",
-      engine => "sosach",
-      captcha => {
-         type      => "jpeg",
-         recaptcha => "6LdOEMMSAAAAAIGhmYodlkflEb2C-xgPjyATLnxx",
-      },
-      antigate  => {
-         key => "",
-      },
-      threads_delay => 0,
-      posts_delay   => 5,
    },
 };

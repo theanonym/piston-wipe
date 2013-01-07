@@ -26,7 +26,7 @@ our $config;
 our $chans;
 
 BEGIN {
-   our $VERSION = "2.7.7";
+   our $VERSION = "2.7.8";
    our $opt;
 
    require "config/config.pl";
@@ -152,13 +152,13 @@ sub wipe_func_1($) {
          if($wipe->{captcha}->has_file) {
             $errors{$proxy} = -1;
             $wipe->run_ocr;
-            $wipe->log(3, "КАПЧА", "Капча не введена!") unless $wipe->{captcha}->is_entered;
+            $wipe->log(3, "КАПЧА", "Капча не введена!") if(!$wipe->{need_captcha} && !$wipe->{captcha}->is_entered);
          } else {
             $errors{$proxy}++ if $errors{$proxy} != -1;
          }
       }
       #----------------------------------------
-      if(!$Piston::config->{thischan}->{captcha} || $wipe->{captcha}->is_entered) {
+      if(!$wipe->{need_captcha} || $wipe->{captcha}->is_entered) {
          my $t = send_post($wipe);
          $t->start;
          $t->join;
@@ -215,9 +215,10 @@ sub wipe_func_2($) {
          $captcha_pool->start_all;
          $captcha_pool->join_all;
 
-         @wipes = grep { !$Piston::config->{thischan}->{captcha} || $_->{captcha}->has_file } @wipes;
+         @wipes = grep { !$_->{need_captcha} || $_->{captcha}->has_file } @wipes;
 
          # Ввод капч
+
          my @antigate_threads;
 
          my $count = @wipes;
@@ -233,15 +234,15 @@ sub wipe_func_2($) {
             } else {
                $wipe->run_ocr(title => "$i/$count");
                $i++;
-               $wipe->log(3, "КАПЧА", "Капча не введена!") unless $wipe->{captcha}->is_entered;
+               $wipe->log(3, "КАПЧА", "Капча не введена!") if(!$wipe->{need_captcha} && !$wipe->{captcha}->is_entered);
             }
-         } @wipes;
+         } grep { $_->{captcha}->has_file } @wipes;
 
          if($Piston::config->{ocr_mode} =~ /antigate/ && @antigate_threads) {
             $_->join for @antigate_threads;
          }
 
-         @wipes = grep { $_->{captcha}->is_entered } @wipes;
+         @wipes = grep { !$_->{need_captcha} || $_->{captcha}->is_entered } @wipes;
       }
 
       # Отправка постов

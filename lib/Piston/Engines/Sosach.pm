@@ -25,6 +25,12 @@ use Yoba;
 sub make_captcha_request($)
 {
    my($wipe) = @_;
+   $wipe->{lwp}->default_header(referer => "http://2ch.hk/$wipe->{board}/res/$wipe->{thread}.html");
+   if($wipe->{lwp}->get("http://2ch.hk/makaba/captcha.fcgi")->{_content} eq "OK")
+   {
+      $wipe->{need_captcha} = 0;
+      return;
+   }
    return Piston::Engines::Recaptcha::make_captcha_request($wipe);
 }
 
@@ -76,9 +82,11 @@ sub handle_captcha_response($)
 }
 
 my $errors = {
-   a => qr/(видео\ имеет\ неверный\ формат)/xo,
+   a => qr/(ПУСТО)/xo,
    b => qr/(
-      Неверный\ код\ подтверждения|Обнаружен\ флуд
+      Неверный\ код\ подтверждения|Обнаружен\ флуд|
+      Вы\ ничего\ не\ написали\ в\ сообщении|
+      видео\ имеет\ неверный\ формат
    )/xo,
 };
 

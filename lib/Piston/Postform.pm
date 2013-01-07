@@ -120,7 +120,8 @@ sub init
    #----------------------------------------
 }
 
-sub CONSTRUCT {
+sub CONSTRUCT
+{
    my $self = shift;
    #----------------------------------------
    # Прочее
@@ -184,12 +185,15 @@ sub CONSTRUCT {
       }
       # Джокеры
       #----------------------------------------
-      $self->{text} =~ s/%rand%/substr(rand, -10)/e;
-      $self->{text} =~ s/%time%/time/e;
-      $self->{text} =~ s/%i%/%% %%/;
-      $self->{text} =~ s/%captcha%/$$self{wipe}{captcha}{text}/;
-      $self->{text} =~ s/%board%/$$self{wipe}{board}/;
-      $self->{text} =~ s/%thread%/$$self{wipe}{thread}/;
+      for($self->{text})
+      {
+         s/%rand%/substr(rand, -10)/e;
+         s/%time%/time/e;
+         s/%i%/%% %%/;
+         s/%captcha%/$$self{wipe}{captcha}{text}/;
+         s/%board%/$$self{wipe}{board}/;
+         s/%thread%/$$self{wipe}{thread}/;
+      }
    }
    #----------------------------------------
    # Чтение файла
