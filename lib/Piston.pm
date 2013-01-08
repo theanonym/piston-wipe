@@ -32,6 +32,42 @@ BEGIN {
    require "config/config.pl";
    require "config/chans.pl";
 
+   say colored("Ошибка в конфиге (config.pl).", "red") and exit
+   unless Params::Check::check({
+      ocr_mode       => { allow => ["hands", "tesseract", "antigate"] },
+      wipe_mode      => { allow => [1, 2] },
+      use_proxy      => { allow => [1, 0] },
+      proxylist      => { defined => 1 },
+      proxies_max    => { defined => 1 },
+      proxies_ignore => { defined => 1 },
+      chan           => { required => 1 },
+      board          => { required => 1 },
+      threads        => { required => 1 },
+      pregen         => { defined => 1 },
+      postform       => { required => 1 },
+      max_connections   => { required => 1 },
+      captcha_timelimit => { required => 1 },
+      post_timelimit    => { required => 1 },
+      captcha_attempts  => { required => 1 },
+      post_attempts     => { required => 1 },
+      errors_limit      => { defined => 1 },
+      loglevel          => { defined => 1 },
+      extensions        => { required => 1 },
+   }, $config, 1);
+
+   say colored("Ошибка в настройке постов (config.pl -> postform).", "red") and exit
+   unless Params::Check::check({
+      text_mode   => { allow => ["", "copypasta", "antikukloeb", "genbred", "posts"] },
+      images_mode => { allow => ["", "folder", "captcha", "youtube"] },
+      randreply   => { defined => 1 },
+      text        => { defined => 1 },
+      folder      => { defined => 1 },
+      email       => { defined => 1 },
+      name        => { defined => 1 },
+      subject     => { defined => 1 },
+      password    => { defined => 1 },
+   }, $config->{postform}, 1);
+
    require Piston::Extensions;
 
    if($config->{postform}->{text_mode}) {

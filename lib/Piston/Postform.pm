@@ -30,7 +30,7 @@ sub init
    sub get_thread_page
    {
       return if $cache->{thread_page};
-      Carp::croak "Нет треда чтобы скачать." unless $Piston::config->{threads}->[0];
+      die "Нет треда чтобы скачать." unless $Piston::config->{threads}->[0];
       $cache->{thread_page} = Boards::get_thread_page(
          $Piston::config->{board},
          $Piston::config->{threads}->[0],
@@ -47,7 +47,7 @@ sub init
       }
       else
       {
-         Carp::croak "Не удалось найти ссылки на посты в треде $Piston::config->{threads}->[0].\n";
+         die "Не удалось найти ссылки на посты в треде $Piston::config->{threads}->[0].\n";
       }
    }
    #----------------------------------------
@@ -62,7 +62,7 @@ sub init
       }
       else
       {
-         Carp::croak "Не удалось посты в треде $Piston::config->{threads}->[0].\n";
+         die "Не удалось посты в треде $Piston::config->{threads}->[0].\n";
       }
    }
    #----------------------------------------
@@ -81,7 +81,7 @@ sub init
       }
       else
       {
-         Carp::croak "Не удалось найти копипасту в '$fname'.\n";
+         die "Не удалось найти копипасту в '$fname'.\n";
       }
    }
    #----------------------------------------
@@ -89,14 +89,14 @@ sub init
    if($Piston::config->{postform}->{images_mode} eq "folder")
    {
       my $path = $Piston::config->{postform}->{folder}->{path};
-      Carp::croak "Неверный путь к папке с картинками '$path'.\n" unless -d $path;
+      die "Неверный путь к папке с картинками '$path'.\n" unless -d $path;
       if(@files = Yoba::find_files(%{ $Piston::config->{postform}->{folder} }))
       {
          printf colored("%d изображений загружено из '$path'.\n", "cyan"), scalar @files;
       }
       else
       {
-         Carp::croak "Не удалось найти картинки в '$path'.\n";
+         die "Не удалось найти картинки в '$path'.\n";
       }
    }
    #----------------------------------------
@@ -113,7 +113,7 @@ sub init
       }
       else
       {
-         Carp::croak "Не удалось найти видео в '$videos'.\n";
+         die "Не удалось найти видео в '$videos'.\n";
       }
    }
    #----------------------------------------
@@ -204,7 +204,7 @@ sub CONSTRUCT
    #----------------------------------------
    if(!defined $self->{text} && !$self->{file} && !$self->{video})
    {
-      Carp::croak "Нет текста и картинки.";
+      warn "Нет текста и картинки.";
    }
    # Связанные объекты Piston::Wipe и Piston::Postrofm не будут удалены
    # счётчиком ссылок.
