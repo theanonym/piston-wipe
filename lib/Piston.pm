@@ -85,7 +85,6 @@ BEGIN {
    } || 1;
 }
 
-
 #----------------------------------------
 # Глобальные переменные
 #----------------------------------------
@@ -294,7 +293,7 @@ sub wipe_func_2($) {
       $posting_pool->start_all;
       $posting_pool->join_all;
 
-      my $success = scalar grep { $_->{post_status} == 0} @wipes;
+      my $success = scalar grep { defined $_->{post_status} && $_->{post_status} == 0} @wipes;
 
       if($success)
       {
