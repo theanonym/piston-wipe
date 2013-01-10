@@ -97,4 +97,11 @@ our $chans = {
       threads_delay => 0,
       posts_delay   => 0,
    },
+
+   auschan => {
+      url => "http://auschan.org/",
+      engine => "auschan",
+      threads_delay => 0,
+      posts_delay   => 0,
+   },
 };
