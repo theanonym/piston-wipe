@@ -44,7 +44,7 @@ sub CONSTRUCT
       opt_antigate  => $Piston::config->{thischan}->{antigate},
    );
    #----------------------------------------
-   $self->{need_captcha} = %{ $Piston::config->{thischan}->{captcha} };
+   $self->{need_captcha} = !!%{ $Piston::config->{thischan}->{captcha} };
    if($Piston::config->{pregen})
    {
       $self->set_board;

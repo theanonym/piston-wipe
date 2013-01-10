@@ -180,7 +180,7 @@ sub wipe_func_1($) {
          $wipe->set_thread;
       #}
       #----------------------------------------
-      if($Piston::config->{thischan}->{captcha}) {
+      if(%{$Piston::config->{thischan}->{captcha}}) {
          my $t = get_captcha($wipe);
          $t->start;
          $t->join;
@@ -236,7 +236,7 @@ sub wipe_func_2($) {
          }
       }
 
-      if($Piston::config->{thischan}->{captcha}) {
+      if(%{$Piston::config->{thischan}->{captcha}}) {
          # Загрузка капч
          my $captcha_pool = new Yoba::Coro::Pool(
             debug => 0,
