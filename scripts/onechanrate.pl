@@ -9,7 +9,8 @@ use 5.010;
 use strict;
 use warnings;
 
-use lib "lib", "../lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use File::Slurp qw/read_file write_file/;
 use File::Path qw/rmtree mkpath/;

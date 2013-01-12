@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use Carp;
 
-use lib "lib";
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 use Term::ANSIColor qw/color colored/;
 

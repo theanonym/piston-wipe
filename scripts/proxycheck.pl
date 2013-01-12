@@ -10,7 +10,8 @@ use strict;
 use warnings;
 use Carp;
 
-use lib "lib", "../lib";
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use File::Slurp qw/write_file/;
 use List::Util qw/shuffle/;

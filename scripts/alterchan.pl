@@ -11,7 +11,9 @@
 use 5.010;
 use strict;
 use warnings;
-use lib "lib", "../lib";
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use LWP;
 use Coro;
