@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 
 use FindBin;
-use lib "$FindBin::Bin/lib";
+use lib "$FindBin::Bin", "$FindBin::Bin/lib";
 
 use Term::ANSIColor qw/color colored/;
 
