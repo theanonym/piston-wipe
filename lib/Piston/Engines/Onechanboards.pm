@@ -26,7 +26,12 @@ sub make_captcha_request($)
 {
    my($wipe) = @_;
    my($sessid) = $wipe->{lwp}->cookie_jar->as_string =~ /PHPSESSID=(.*?);/;
-   die "Не удалось получить PHPSESSID" unless $sessid;
+   # die "Не удалось получить PHPSESSID" unless $sessid;
+   unless($sessid)
+   {
+      $sessid = "";
+      $wipe->log(4, "КАПЧА", "Не удалось получить PHPSESSID")
+   }
    # http://1chan.ru/captcha/?key=board_comment&PHPSESSID=$sessid
    return GET(caturl(
       $Piston::config->{thischan}->{url},

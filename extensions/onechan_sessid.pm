@@ -35,7 +35,7 @@ sub get_cookie
    {
       $wipe->{lwp}->get("http://1chan.ru/news/all/");
    }
-   die "Не удалось получить PHPSESSID" unless $wipe->{lwp}->cookie_jar->as_string =~ /PHPSESSID/;
+   # die "Не удалось получить PHPSESSID" unless $wipe->{lwp}->cookie_jar->as_string =~ /PHPSESSID/;
 }
 
 2;
