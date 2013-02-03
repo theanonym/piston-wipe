@@ -19,19 +19,27 @@ use File::MimeInfo qw/mimetype/;
 use HTTP::Request::Common qw/GET POST/;
 
 use Yoba;
+use Coro::LWP;
 
 # -> Piston::Wipe
 # <- HTTP::Request
 sub make_captcha_request($)
 {
    my($wipe) = @_;
-   $wipe->{lwp}->default_header(referer => "http://2ch.hk/$wipe->{board}/res/$wipe->{thread}.html");
-   if($wipe->{lwp}->get("http://2ch.hk/makaba/captcha.fcgi")->{_content} eq "OK")
+   my $lwp = new Yoba::LWP;
+   $lwp->default_header(
+      referer => "http://2ch.hk/$wipe->{board}/" . ($wipe->{thread} ? "res/$wipe->{thread}.html" : "")
+   );
+   my $res = $lwp->get("http://2ch.hk/makaba/captcha.fcgi");
+   if(my($key) = $res->content =~ /\w+\n(\w+)/)
    {
-      $wipe->{need_captcha} = 0;
+      $wipe->{recaptcha_key} = $key;
+      return GET("http://i.captcha.yandex.net/image?key=$key");
+   }
+   else
+   {
       return;
    }
-   return Piston::Engines::Recaptcha::make_captcha_request($wipe);
 }
 
 # -> Piston::Wipe
@@ -50,8 +58,8 @@ sub make_post_request($)
       kasumi  => $wipe->{postform}->{subject},
       shampoo => $wipe->{postform}->{text},
       video   => ($wipe->{postform}->{video} ? "http://www.youtube.com/watch?v=$wipe->{postform}->{video}" : ""),
-      recaptcha_challenge_field => $wipe->{recaptcha_key},
-      recaptcha_response_field  => $wipe->{captcha}->{text},
+      captcha => $wipe->{recaptcha_key}, # Поле для рекапчи используется намеренно
+      captcha_value  => $wipe->{captcha}->{text},
    ];
    #----------------------------------------
    # Картинка
@@ -75,10 +83,27 @@ sub make_post_request($)
 
 # -> Piston::Wipe
 # <- number, string
+# 0 - Успешно
+# 1 - Ошибка
+# 2 - Фатальная ошибка для этой прокси
 sub handle_captcha_response($)
 {
    my($wipe) = @_;
-   return Piston::Engines::Recaptcha::handle_captcha_response($wipe);
+   my $response = $wipe->{captcha_response};
+   my $cfmt = $Piston::config->{thischan}->{captcha}->{type};
+   #----------------------------------------
+   my($errcode, $errstr);
+   if(exists $response->{_headers}->{"content-type"} && $response->{_headers}->{"content-type"} =~ /image\/$cfmt/)
+   {
+      ($errcode, $errstr) = (0, "");
+      write_file("$Piston::config->{chan}_good_proxy.txt", { append => 1 }, "$$wipe{proxy}\n");
+   }
+   else
+   {
+      ($errcode, $errstr) = (1, $response->status_line);
+   }
+   #----------------------------------------
+   return ($errcode, $errstr);
 }
 
 my $errors = {

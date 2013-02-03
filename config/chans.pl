@@ -28,8 +28,8 @@ our $chans = {
       url => "http://2ch.hk/",
       engine => "sosach",
       captcha => {
-         type      => "jpeg",
-         recaptcha => "6LdOEMMSAAAAAIGhmYodlkflEb2C-xgPjyATLnxx",
+         type => "gif",
+         recaptcha => 1, # Чтобы запросы ключей были в разных потоках
       },
       antigate  => {
          key => "",
