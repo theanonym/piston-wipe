@@ -59,7 +59,7 @@ sub make_post_request($)
       shampoo => $wipe->{postform}->{text},
       video   => ($wipe->{postform}->{video} ? "http://www.youtube.com/watch?v=$wipe->{postform}->{video}" : ""),
       captcha => $wipe->{recaptcha_key}, # Поле для рекапчи используется намеренно
-      captcha_value  => $wipe->{captcha}->{text},
+      captcha_value_id_06  => $wipe->{captcha}->{text},
    ];
    #----------------------------------------
    # Картинка
