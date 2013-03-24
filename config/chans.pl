@@ -73,20 +73,6 @@ our $chans = {
       posts_delay   => 15,
    },
 
-   onechan_boards => {
-      url    => "http://1chan.ru/",
-      engine => "onechanboards",
-      captcha => {
-         type => "jpeg",
-      },
-      antigate => {
-         key => "",
-      },
-      threads_delay => 0,
-      posts_delay   => 0,
-      homeboards => ["anonymous"],
-   },
-
    rfchan => {
       url => "http://rfchan.ru/",
       engine => "rfchan",
@@ -104,4 +90,21 @@ our $chans = {
       threads_delay => 0,
       posts_delay   => 0,
    },
+
+   dvachrunet => {
+      url => "https://2chru.net/",
+      engine => "dvachrunet",
+      captcha => {
+         type      => "gif",
+      },
+      antigate  => {
+         key        => "",
+         is_russian => 1,
+         min_len    => 3,
+         max_len    => 4,
+      },
+      threads_delay => 0,
+      posts_delay   => 8,
+   },
 };
+
