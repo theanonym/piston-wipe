@@ -106,5 +106,19 @@ our $chans = {
       threads_delay => 0,
       posts_delay   => 8,
    },
+
+   tiretirech => {
+      url => "http://2--ch.ru/",
+      engine => "ochoba",
+      captcha => {
+         type => "png",
+      },
+      tesseract => {
+         lang   => "rus",
+         config => "rus_upcase",
+      },
+      threads_delay => 0,
+      posts_delay   => 0,
+   },
 };
 
